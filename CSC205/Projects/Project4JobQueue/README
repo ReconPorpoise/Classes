@@ -1,0 +1,87 @@
+Project 4: The Job Queue Program
+---------------------------------------------------------------------------------------------------------------------------------------
+The Job Queue Program is a piece of software that allows users to enter a jobs-list file as a command line argument, then run a simulation of a CPU process queue. 
+The expected output is the proper stats of the run including:
+-Average Wait Time
+-CPU Usage
+-CPU Idle Time
+-CPU Usage (in percentage)
+
+To accomplish this, it is necessary to implement...
+
+The Queue ADT with the methods:
+---Queue is implemented using the Node ADT/Linked Lists--- 
+-isEmpty() - checks if the passed queue is empty
+-enqueue(Object newItem) - creates a new node at the end of the passed queue
+-dequeue() - removes the front node of the passed queue
+-front() - picks out the object that is in the first node of the passed queue
+ 
+Implement the Job class:
+-Constructor creates a new Job object with a blank name and 0 arrivalTime, startTime, runTime, waitTime, and turnTime 
+-There is an override constructor that allows the program to create a Job object with a specified name, arrivalTime, and runTime
+-toString() method to print the Job correctly at the end of the run
+
+Implement a driver program, TimeShare.java:
+The driver program needs a few key methods to allow for modularity and remove the need for global variables:
+-fillInput(Queue inputQueue, File inFile) - uses the file to fill the Job input queue where job's will wait for their arrival time to move to the process queue. It needs a while(fileScanner.hasNext()) loops to make sure it parses through each line in the file. At each line, it needs to split the sentence into each of its three parts, then parse the arrivalTime and runTime to Integers to pass to the Job override constructor.
+-deQ(Queue inQueue) - this allows for "global" use of queues, as you can dequeue from anywhere in the program without making the queue public-static. This returns the updated queue back to the method that called it.
+-enQ(Queue inQueue, Job currentJob) - this allows for "global" use of queues as well. You can enqueue to whatever queue you input from anywhere in the program and it returns the updated queue.
+-addProcess(Job currentJob, int clock, Queue processQueue, Queue inputQueue) - this takes the Job, splits it into parts, then takes the arrival time. A temporary variable called count is set equal to clock, to keep the clock time consistent, then while the arrivalTime is larger than the clock (the Job's time to move to the process queue has not arrived), increment the count variable by one. When the arrivalTime does come, remove it from the inputQueue and move it to the processQueue. This method will return count - clock (to remove the initial extra clock time), then clock and idle will be increased by that value because if the program is waiting for an arrivalTime, it is considered idle CPU time.
+-runTime(Job currentJob, int clock, ArrayList<Integer> waitTimes, Queue outputQueue, Queue processQueue) - this method takes creates a variable called startTime (the actual time in which the Job is executed, not the expected one passed from the file) and sets it equal to the current clock time. This is passed into currentJob.startTime to keep track of that specific Job's start time. The waitTime (startTime - arrivalTime) is also passed to the currentJob. The waitTime is added to the waitTimes ArrayList to keep track of all the wait times for averaging later on. The currentJob is also split apart here, this time to take out the runTime. Count is also initialized here to keep track of the time change from the start to end. This logic that is used here will be while((count - startTime) != runTime, increment the clock by one. This is because each job has a set runTime that it needs to take to finish its execution. So while the clock time - the time it started does not equal to the correct runTime, keep running it. We then pass the turnTime (finish time - arrivalTime) to the current job. We set the Job to queue into the outputQueue, and remove it from the processQueue. Returns count - clock to increment clock and usage variables in the method that called it.
+-runAll(Queue inputQueue) - this is the method that decides when to call the other methods. It will initialize int clock = 1 (default start time), double usage and idle = 0, initialize the process and output queues, and the waitTimes ArrayList. The logic used here is while (! inputQ.isEmpty() || ! processQ.isEmpty()) to parse through both input and process queues to move the jobs from file to, eventually, the done-output queue. At the top of the loop, double increase = 0 is inintialized so the nested if statment can hold the correct return values from addProcess and runTime. The next set of logic is if(! inputQueue.isEmpty()), set the currentJob to be the one in the front of the inputQueue (highest priority), then set increase to = addProcess(currentJob, clock, processQueue, inputQueue) to get the correct clock and idle increase time. We then increment clock and idle by this value, then we set increase to be the runTime(sameCurrentJob, clock, waitTimes, outputQueue, processQueue) to get the correct runTime for the currentJob, then increment clock and usage by this. Else, set the currentJob to be processQueue.front() then do the same as the second half of the if. It is done this way to only deal with one Job at a time, and not confuse the logic with dealing with multiple Jobs at the same time. This sees to the execution of the current Job before moving on to the next and moving it to the processQueue. The method then calls printOut(outputQueue, waitTimes, idle, usage).
+-printOut(Queue toPrint, ArrayList<Integer> waitTimes, double idle, double usage) - does the calculations for averageWait (sum of all ArrayList elements / ArrayList.size()), usagePercentage((usage / (usage + idle)) * 100), then prints all jobs' id, arrivalTime, startTime, turnTime, waitTime, turnaroundTime, average wait time, cpu usage, cpu idle time, and cpu usage as a percentage.
+
+Variables:
+
+-File inFile == file that is input at the command line and is used to fill the input queue
+-Queue inQ == input queue that holds all jobs that come from the input file
+-Queue processQ == process queue that gets filled when each individual job's arrival time comes
+-Queue outputQ == output queue that holds completed jobs to wait for printing
+-int clock == pseudo-clock used to check when to fill the process queue and execute jobs
+-String[] job == used to create the job pieces (name, arrivalTime, runTime) for job temp in fillInput to create jobs for input queue
+-int startTime == time in clock-unit time when the job starts to execute
+-String[] parts == splits up all parts of the current job to pull out arrivalTime and runTime
+-int arrivalTime == the time in clock-unit time in which the job should leave the input queue and enter the process queue
+-int runTime == how long it takes a job to execute in clock-unit time
+-double usage == tracks when the "CPU" is working (when there is a process currently happening): increases only during runTime method
+-double idle == time in which the "CPU" is waiting for a job's arrival time to come: increases only during certain instances of addProcess method
+-ArrayList<Integer>() waits == used to hold the wait time for each job (startTime - arrivalTime): used for average wait calculation in printOut method
+-double averageWait == average wait experienced from all jobs: (sum of all waits) / waits.size()
+-double usagePercent == the ratio between "CPU" usage time and "CPU" idle time: (usage / (usage + idle)) * 100 
+
+Example Run:
+
+job1	02	04
+job2	03	01
+job3	05	05
+job4	12	03
+job5	20	15
+
+---Logic will be shown with the first two jobs, as it is repetitive. Output will show all 5 jobs---
+
+fillInput(inputQueue, inFile) -> adds (job1, 02, -1, 04, 0, 0) and (job2, 03, -1, 01, 0, 0) to the inputQueue. 
+
+runAll(inputQueue) -> currentJob = job1, pass it to addProcess, increase now = 1, clock = 2, and idle = 1. Next, pass job1 to runTime. Increase now = 5, clock = 6, usage = 4. Now, we add job2 to the processQueue, pass it to addProcess --> increase = 0 because the arrival time has already passed. Then we pass to runTime --> increase = 1, clock = 7, usage = 5 and waits = 3. 
+
+printOut(outputQueue, waits, idle, usage) --> 
+
+---------------------------------------------------------------------------------------------------------------------------------------
+Job Control Analysis : Summary Report
+
+job id	arrival	start	run	wait	turnaround
+	time	time	time	time	time
+------	-------	-----	----	----	----------
+job1	2	2	4	0	4
+job2	3	6	1	3	4
+job3	5	7	5	2	7
+job4	12	12	3	0	3
+job5	20	20	15	0	15
+
+---------------------------------------------------------------------------------------------------------------------------------------
+Run-time Stats:
+
+  Average Wait Time => 1.00 --> job2 = 3, job3 = 2 == 5 / 5 == 1
+  	  CPU Usage => 28.00 --> job1 = 4, job2 = 1, job3 = 5, job4 = 3, job5 = 15 == 28
+	   CPU Idle => 6.00 --> job2 = 3, job3 = 3 == 6 
+       CPU Usage(%) => 82.35% --> (28 / (28 + 6)) * 100 == 82.35
+---------------------------------------------------------------------------------------------------------------------------------------

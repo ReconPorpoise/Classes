@@ -1,0 +1,50 @@
+Chapter 4:
+-flip-flop: a storage element capable of storing a single bit of information. They are the basis of registers. 
+
+Overview:
+-SR flip-flop
+	-S: set
+	-R: reset
+	-Q; Q': outputs
+		-Q is the state of the flip-flop
+		-If Q, the flip-flop is set (1)
+		-If Q', the flip-flip is reset (0)
+	-Can be "rising-edge" or "falling-edge" activated. 	
+		-This is when the flip-flop is activated. Either when the clock is rising in pulse or falling in pulse respectively.
+	-Characteristic Table
+	 --------------------
+	    S  R | Q(t+1)
+	    -------------
+	    0  0 | Q(t)
+            0  1 | 0
+	    1  0 | 1
+            1  1 | indeterminate 
+-JK flip-flop (7476)
+	-J: set
+	-K: reset
+	-Characteristic Table
+	 --------------------
+	    J  K | Q(t+1)
+            -------------
+            0  0 | Q(t)
+            0  1 | 0
+            1  0 | 1
+            1  1 | Q'(t) <-- inverts
+
+-D flip-flop (7474)
+	-D: data
+	-Characteristic Table
+	 --------------------
+	    D | Q(t+1)
+	    ----------
+	    0 | 0
+	    1 | 1
+-T flip-flop
+	-T: toggle
+	-Characteristic Table
+         --------------------
+            T | Q(t+1)
+            ----------
+            0 | Q(t)
+            1 | Q'(t)
+

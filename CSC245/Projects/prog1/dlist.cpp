@@ -25,6 +25,7 @@ DList<ItemType>::~DList   ()
 
 }
 
+/*
 template <class ItemType>
 void DList<ItemType>::makeEmpty()
 {
@@ -54,23 +55,36 @@ bool DList<ItemType>::inList (ItemType item) const
 
 
 }
+*/
 
 template <class ItemType>
 bool DList<ItemType>::isEmpty() const		
 {
 	// Post : function returns true if list is empty, false otherwise
-	
+	return head == NULL;	
 }
 
+
+// WORKS
 template <class ItemType>
 void DList<ItemType>::print() const	
 {
 	// Pre  : List is not empty 
 	// Post : Items in List have been printed to screen
-
-
+	NodeType<ItemType>* temp = new NodeType<ItemType>;
+	temp = head;
+	if( temp == NULL ) {
+		cout << "List is empty.\n";
+	}	
+	else {
+		while( temp !=  NULL ) {
+			cout << temp -> info << "\n";
+			temp = temp -> next;
+		}
+	}
 }
-	
+
+// WORKS
 template <class ItemType>
 void DList<ItemType>::insertHead(ItemType item)	
 {
@@ -78,25 +92,65 @@ void DList<ItemType>::insertHead(ItemType item)
         // Post : item is inserted at head of list;  Former first node is 
         //        linked back to this new one via double link;
         //        Length incremented;  Special case handled if list is empty 
+
+	NodeType<ItemType>* newNode = new NodeType<ItemType>;
+	newNode -> info = item;
+	newNode -> back = NULL;
 	
+	if( head != NULL ) {
+		head -> back = newNode;
+		newNode -> next = head;
+	}
+	else {
+		newNode -> next = NULL;
+	}			
+
+	head = newNode;
+	length++;
 }
 
+// WORKS
 template <class ItemType>
 void DList<ItemType>::appendTail(ItemType item)
 {
 	//  Pre :  item to be inserted is passed in via parameter
         // Post :  item is added to tail of list; Former last node
         //         is linked to this new one via double link 
-
-
+	NodeType<ItemType>* newNode = new NodeType<ItemType>;
+	NodeType<ItemType>* tail = new NodeType<ItemType>;
+	
+	newNode -> info = item;
+	newNode -> next = NULL;
+	
+	// look for tail, then set newNode as its next, and newNode's back as tail
+	tail = head;
+	if( tail == NULL ) {
+		newNode -> back = NULL;
+		head = newNode;
+		length++;
+	}
+	else {
+		while( tail -> next != NULL ) {
+			tail = tail -> next;
+		}
+		tail -> next = newNode;
+		newNode -> back = tail;
+		
+		length++;
+	}
+	
+	
 }
 
+// WORKS
 template <class ItemType>
 int DList<ItemType>::lengthIs() const	
 {
 	// Post : Function returns current length of list  
+	return length;
 }
 
+/*
 template <class ItemType>
 NodeType<ItemType>* DList<ItemType>::location(ItemType item) const	
 {
@@ -128,3 +182,4 @@ void DList<ItemType>::deleteLocation (NodeType<ItemType>* delPtr)
 
 
 }
+*/

@@ -18,6 +18,9 @@ int main()
 	list.appendTail(35);
 	cout << "Length: " << list.lengthIs() << endl;
 	list.print();
+	
+	cout << "Is 30 in list: " << list.inList(30) << endl;
+
 	if( list.isEmpty() )	
 		cout << "Is it empty: yes\n";
 	else 

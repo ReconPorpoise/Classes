@@ -45,17 +45,28 @@ void DList<ItemType>::deleteItem (ItemType item)
 
 
 }
+*/
 
+// WORKS
 template <class ItemType>
 bool DList<ItemType>::inList (ItemType item) const
 {
 	//  Pre :  item to be located is passed in via parameter 
         // Post :  function returns bool value if item is found 
-
-
-
+	NodeType<ItemType>* temp = new NodeType<ItemType>;
+	temp = head;
+	
+	bool found = false;
+	while( temp != NULL ) {
+		if( temp -> info == item ) {
+			found = true;
+			return found;
+		}
+		else 
+			temp = temp -> next;
+	}
+	return found;
 }
-*/
 
 template <class ItemType>
 bool DList<ItemType>::isEmpty() const		

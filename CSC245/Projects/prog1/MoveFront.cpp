@@ -26,5 +26,10 @@ int main()
 		cout << "Is it empty: no\n";
 	
 	cout << "Length: " << list.lengthIs() << endl;
+	
+	cout << "After deleting 20:\n";
+	list.deleteItem(20);
+	list.print();
+
 	return 0;
 }

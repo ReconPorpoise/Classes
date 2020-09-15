@@ -25,22 +25,21 @@ DList<ItemType>::~DList   ()
 
 }
 
-/*
+
 template <class ItemType>
 void DList<ItemType>::makeEmpty()
 {
     // Post: List is empty; all items have been deallocated.
-
+    
 }
-*/
 
-
+// WORKS
 template <class ItemType>
 void DList<ItemType>::deleteItem (ItemType item)	
 {
 	//  Pre :  item to be deleted is passed in via parameter 
         // Post :  item is deleted if it exists in list 
-
+	deleteLocation( location( item ) );
 }
 
 // WORKS
@@ -64,6 +63,7 @@ bool DList<ItemType>::inList (ItemType item) const
 	return found;
 }
 
+// WORKS
 template <class ItemType>
 bool DList<ItemType>::isEmpty() const		
 {
@@ -145,8 +145,6 @@ void DList<ItemType>::appendTail(ItemType item)
 		
 		length++;
 	}
-	
-	
 }
 
 // WORKS
@@ -175,14 +173,20 @@ NodeType<ItemType>* DList<ItemType>::location(ItemType item) const
 	return NULL;		
 }
 
-/*
+// WORKS
 template <class ItemType>
 NodeType<ItemType>* DList<ItemType>::last() const	
 {
 	// Post : Function returns location of current last item in list
-	
+	NodeType<ItemType>* temp = head;
+	// keep jumping node to node until node -> next is NULL (end)
+	while( temp -> next != NULL ) {
+		temp = temp -> next;
+	}	
+	return temp;		
 }
 
+// WORKS
 template <class ItemType>
 void DList<ItemType>::deleteLocation (NodeType<ItemType>* delPtr)	
 {
@@ -195,7 +199,31 @@ void DList<ItemType>::deleteLocation (NodeType<ItemType>* delPtr)
 
         // Special Cases Handled for Deleting Only One Item in List,
         // The Head Item of List, and the Tail Item of List
-
-
+        
+	// if its a size 1 list
+	if( length == 1 ) {
+		head = NULL;
+	}
+	// if its the head
+	else if( delPtr == head ) {
+		head = delPtr -> next;
+	}
+	// if its the tail
+	else if( delPtr == last() ) {
+		// new tail is the prev node so point that to NULL, then point that back to the node behind it
+		delPtr -> back -> next = NULL;
+		delPtr -> back -> back -> next = delPtr -> back;
+		delPtr -> back -> back = delPtr -> back -> back;
+		delPtr = NULL;
+		free( delPtr );
+	}
+	// all others
+	else {
+		// node gets removed. it's old next now becomes it's previous node's next, and the it's old back now becomes the next node's back
+		delPtr -> back -> next = delPtr -> next;
+		delPtr -> next -> back = delPtr -> back;
+		delPtr = NULL;
+	}
+	free( delPtr );	
 }
-*/
+

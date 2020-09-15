@@ -12,5 +12,5 @@ deleteItem	-- delete item found using inList and
 		-- 3. remove nested node
 		-- 4. remove len(1) list item
 last
-location
+location	done
 deleteLocation

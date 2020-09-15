@@ -41,8 +41,6 @@ void DList<ItemType>::deleteItem (ItemType item)
 	//  Pre :  item to be deleted is passed in via parameter 
         // Post :  item is deleted if it exists in list 
 
-
-
 }
 
 // WORKS
@@ -159,16 +157,25 @@ int DList<ItemType>::lengthIs() const
 	return length;
 }
 
-/*
+// WORKS
 template <class ItemType>
 NodeType<ItemType>* DList<ItemType>::location(ItemType item) const	
 {
 	//  Pre : item to be located is passed in via parameter 
         // Post : function returns address of item being searched for --
         //        if not found, NULL is returned  
-	
+	NodeType<ItemType>* temp = head;
+
+	while( temp != NULL ) {
+		if( temp -> info == item ) {
+			return temp;
+		}
+		temp = temp -> next;
+	}	
+	return NULL;		
 }
 
+/*
 template <class ItemType>
 NodeType<ItemType>* DList<ItemType>::last() const	
 {

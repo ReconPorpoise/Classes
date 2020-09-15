@@ -31,10 +31,9 @@ void DList<ItemType>::makeEmpty()
 {
     // Post: List is empty; all items have been deallocated.
 
-
-
-
 }
+*/
+
 
 template <class ItemType>
 void DList<ItemType>::deleteItem (ItemType item)	
@@ -45,7 +44,6 @@ void DList<ItemType>::deleteItem (ItemType item)
 
 
 }
-*/
 
 // WORKS
 template <class ItemType>

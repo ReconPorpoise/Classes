@@ -1,0 +1,13 @@
+isEmpty		done
+insertHead	done
+appendTail	done
+print		done
+lengthIs	done
+inList		-- return bool if its in the list or not
+makeEmpty	-- deallocate all memory, head == NULL
+deleteItem	-- delete item found using inList and 
+		-- deleting location using deleteLocation
+
+last
+location
+deleteLocation

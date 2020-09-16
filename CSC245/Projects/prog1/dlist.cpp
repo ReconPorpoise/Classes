@@ -29,8 +29,10 @@ DList<ItemType>::~DList   ()
 template <class ItemType>
 void DList<ItemType>::makeEmpty()
 {
-    // Post: List is empty; all items have been deallocated.
-    
+    	// Post: List is empty; all items have been deallocated.
+	while( !isEmpty() ) {
+		deleteLocation( last() );
+	}
 }
 
 // WORKS
@@ -202,28 +204,35 @@ void DList<ItemType>::deleteLocation (NodeType<ItemType>* delPtr)
         
 	// if its a size 1 list
 	if( length == 1 ) {
+		delete delPtr;
+		delPtr = NULL;
 		head = NULL;
+		length--;
 	}
 	// if its the head
 	else if( delPtr == head ) {
 		head = delPtr -> next;
+		head -> back = NULL;
+		delete delPtr;
+		delPtr = NULL;
+		length--;
 	}
 	// if its the tail
 	else if( delPtr == last() ) {
 		// new tail is the prev node so point that to NULL, then point that back to the node behind it
 		delPtr -> back -> next = NULL;
-		delPtr -> back -> back -> next = delPtr -> back;
-		delPtr -> back -> back = delPtr -> back -> back;
+		delete delPtr;
 		delPtr = NULL;
-		free( delPtr );
+		length--;
 	}
 	// all others
 	else {
 		// node gets removed. it's old next now becomes it's previous node's next, and the it's old back now becomes the next node's back
 		delPtr -> back -> next = delPtr -> next;
 		delPtr -> next -> back = delPtr -> back;
+		delete delPtr;
 		delPtr = NULL;
+		length--;
 	}
-	free( delPtr );	
 }
 

@@ -5,30 +5,27 @@ using namespace std;
 int main()
 {
 	DList<int> list;
-	if( list.isEmpty() ) 
-		cout << "Is it empty: yes\n";
-	else 
-		cout << "Is it empty: no\n";
-	list.appendTail(10);
-	list.insertHead(15);
+	list.insertHead(10);
+	list.appendTail(15);
 	list.appendTail(20);
-	cout << "Length: " << list.lengthIs() << endl;
+	list.appendTail(25);
+	cout << "First list print:\n";
 	list.print();
-	list.insertHead(30);
-	list.appendTail(35);
-	cout << "Length: " << list.lengthIs() << endl;
+	
+	list.deleteItem(10);
+	cout << "List after head removed:\n";
 	list.print();
-	cout << "Is 30 in list: " << list.inList(30) << endl;
+	
+	list.deleteItem(25);
+	cout << "List after tail removed:\n";
+	list.print();
 
-	if( list.isEmpty() )	
-		cout << "Is it empty: yes\n";
-	else 
-		cout << "Is it empty: no\n";
+	list.deleteItem(15);
+	cout << "List after tail removed:\n";
+	list.print();
 	
-	cout << "Length: " << list.lengthIs() << endl;
-	
-	cout << "After deleting 20:\n";
 	list.deleteItem(20);
+	cout << "List after last item removed:\n";
 	list.print();
 
 	return 0;

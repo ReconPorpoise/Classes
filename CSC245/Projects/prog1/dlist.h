@@ -20,6 +20,7 @@ public :
     void insertHead (ItemType item); 
     void appendTail (ItemType item); 
     int lengthIs() const;
+    void sortList();
 
 private :
     // Private Attributes of a DList Object 

@@ -43,6 +43,7 @@ int main()
 			case 'D': system( "clear" ); Delete( list ); break;
 			case 'P': system( "clear" ); PrintList( list ); break;
 			case 'L': system( "clear" ); PrintLength( list ); break;
+			case 'S': system( "clear" ); SortList( list ); break;
 			case 'Q': system( "clear" ); cout << "Program quitting...\n"; break;
 			default: system( "clear" ); cout << "Incorrect input. Try again.\n";
 		}
@@ -61,6 +62,7 @@ void PrintMenu()
 	cout << "| D: Delete an item in the list |\n";
 	cout << "| P: Print the whole list       |\n";
 	cout << "| L: Print the list's length    |\n";
+	cout << "| S: Sort the list              |\n";
 	cout << "| Q: Quit the program           |\n";
 	cout << "|                               |\n";
 	cout << "---------------------------------\n";
@@ -162,4 +164,14 @@ void PrintLength( const DList<int>& list )
 		cout << "List is empty.\n";
 	else
 		cout << "List length: " << list.lengthIs() << endl;
+}
+
+void SortList( DList<int>& list )
+{
+	if( list.isEmpty() )
+		cout << "List is empty.\n";
+	else {
+		list.sortList();
+		cout << "List sorted.\n";
+	}
 }

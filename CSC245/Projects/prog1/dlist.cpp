@@ -1,6 +1,7 @@
 #include <cstddef> 
 #include <iostream>
 #include <vector>
+#include <algorithm>
 
 using namespace std;
 
@@ -261,5 +262,34 @@ void DList<ItemType>::deleteLocation (NodeType<ItemType>* delPtr)
 		delete delPtr;
 		delPtr = NULL;
 		length--;
+	}
+}
+
+template <class ItemType>
+void DList<ItemType>::sortList()
+{
+	// Pre : List to be sorted calls .sort()
+	
+	// Post : Updates list to be sorted in ascending order
+	
+	vector<ItemType> content;	
+	NodeType<ItemType>* temp = head;
+	
+	if( temp != NULL ) {
+		while( temp != NULL ) {
+			// push all dll info to a vector
+			content.push_back( temp -> info );
+			temp = temp -> next;
+		}
+
+		// sort vector then fill then replace all dll info with the correctly sorted info
+		sort( content.begin(), content.end() );
+		temp = head;
+		
+		while( temp != NULL ) {
+			temp -> info = content[ 0 ];
+			content.erase( content.begin() );
+			temp = temp -> next;
+		}
 	}
 }

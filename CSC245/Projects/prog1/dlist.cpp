@@ -23,7 +23,7 @@ template <class ItemType>
 DList<ItemType>::~DList   ()		
 {
 	// Post: List is empty; All items have been deallocated.
-
+	makeEmpty();
 }
 
 template <class ItemType>

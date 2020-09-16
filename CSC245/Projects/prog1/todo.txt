@@ -1,11 +1,2 @@
-isEmpty		done
-insertHead	done
-appendTail	done
-print		done
-lengthIs	done
-inList		done
-makeEmpty	-- deallocate all memory, head == NULL
-	
-last		done
-location	done
-deleteLocation  done
+-- Add PrintLength( DList<int>& list ) 
+-- Add do-while loop for options menu

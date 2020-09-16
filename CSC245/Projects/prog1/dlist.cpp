@@ -82,14 +82,17 @@ void DList<ItemType>::print() const
 	// Post : Items in List have been printed to screen
 	NodeType<ItemType>* temp = new NodeType<ItemType>;
 	temp = head;
+	int counter = 1;
 	if( temp == NULL ) {
 		cout << "List is empty.\n";
 	}	
 	else {
 		while( temp !=  NULL ) {
-			cout << temp -> info << "\n";
+			cout << counter << ":\t" << temp -> info << "\n";
 			temp = temp -> next;
+			counter++;
 		}
+		cout << "End of the list.\n";
 	}
 }
 

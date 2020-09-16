@@ -1,5 +1,6 @@
 #include <cstddef> 
 #include <iostream>
+#include <vector>
 
 using namespace std;
 
@@ -25,34 +26,39 @@ DList<ItemType>::~DList   ()
 
 }
 
-
 template <class ItemType>
 void DList<ItemType>::makeEmpty()
 {
     	// Post: List is empty; all items have been deallocated.
+	
+	// until the list is empty, delete the tail over and over.
 	while( !isEmpty() ) {
 		deleteLocation( last() );
 	}
 }
 
-// WORKS
 template <class ItemType>
 void DList<ItemType>::deleteItem (ItemType item)	
 {
 	//  Pre :  item to be deleted is passed in via parameter 
         // Post :  item is deleted if it exists in list 
+        
+	// delete the node at the item's location
 	deleteLocation( location( item ) );
 }
 
-// WORKS
 template <class ItemType>
 bool DList<ItemType>::inList (ItemType item) const
 {
 	//  Pre :  item to be located is passed in via parameter 
         // Post :  function returns bool value if item is found 
+	
+	// create a temp that is equal to head so we don't change head
 	NodeType<ItemType>* temp = new NodeType<ItemType>;
 	temp = head;
 	
+	// parse the whole list until we find the value
+	// if we don't, jump to the next one 
 	bool found = false;
 	while( temp != NULL ) {
 		if( temp -> info == item ) {
@@ -65,11 +71,13 @@ bool DList<ItemType>::inList (ItemType item) const
 	return found;
 }
 
-// WORKS
 template <class ItemType>
 bool DList<ItemType>::isEmpty() const		
 {
 	// Post : function returns true if list is empty, false otherwise
+	
+	// returns true if there is no value in head
+	// otherwise, the list is not empty
 	return head == NULL;	
 }
 
@@ -80,13 +88,17 @@ void DList<ItemType>::print() const
 {
 	// Pre  : List is not empty 
 	// Post : Items in List have been printed to screen
+
+	// temp used to not change head value or pointers
 	NodeType<ItemType>* temp = new NodeType<ItemType>;
 	temp = head;
 	int counter = 1;
+	// check if it's empty before parsing
 	if( temp == NULL ) {
 		cout << "List is empty.\n";
 	}	
 	else {
+		// print the info at each node before jumping to the next
 		while( temp !=  NULL ) {
 			cout << counter << ":\t" << temp -> info << "\n";
 			temp = temp -> next;
@@ -105,14 +117,19 @@ void DList<ItemType>::insertHead(ItemType item)
         //        linked back to this new one via double link;
         //        Length incremented;  Special case handled if list is empty 
 
+	// if the list is empty, just create a node as head,
+	// where the back is NULL and the info is the item passed
 	NodeType<ItemType>* newNode = new NodeType<ItemType>;
 	newNode -> info = item;
 	newNode -> back = NULL;
 	
+	// if there are items in the list, set the head to the second item and
+	// have the new item become the head node
 	if( head != NULL ) {
 		head -> back = newNode;
 		newNode -> next = head;
 	}
+	// if there is just an empty head node, replace it with newNode 
 	else {
 		newNode -> next = NULL;
 	}			
@@ -121,7 +138,6 @@ void DList<ItemType>::insertHead(ItemType item)
 	length++;
 }
 
-// WORKS
 template <class ItemType>
 void DList<ItemType>::appendTail(ItemType item)
 {
@@ -141,6 +157,8 @@ void DList<ItemType>::appendTail(ItemType item)
 		head = newNode;
 		length++;
 	}
+	// if there are list items, keep pushing to the end THEN insert the 
+	// node with the correct pointers to the previous node
 	else {
 		while( tail -> next != NULL ) {
 			tail = tail -> next;
@@ -157,6 +175,9 @@ template <class ItemType>
 int DList<ItemType>::lengthIs() const	
 {
 	// Post : Function returns current length of list  
+	
+	// returns the private variable "length" that we increment/
+	// decrement in insertHead, appendTail, and delete functions
 	return length;
 }
 
@@ -167,8 +188,12 @@ NodeType<ItemType>* DList<ItemType>::location(ItemType item) const
 	//  Pre : item to be located is passed in via parameter 
         // Post : function returns address of item being searched for --
         //        if not found, NULL is returned  
+
+	// temp variable to not mess up head
 	NodeType<ItemType>* temp = head;
 
+	// search the list for a node with info matching item,
+	// then return that node. Else return NULL
 	while( temp != NULL ) {
 		if( temp -> info == item ) {
 			return temp;
@@ -238,4 +263,3 @@ void DList<ItemType>::deleteLocation (NodeType<ItemType>* delPtr)
 		length--;
 	}
 }
-

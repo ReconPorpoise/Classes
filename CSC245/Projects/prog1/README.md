@@ -6,7 +6,7 @@ To accomplish modularity and reusability, templates are implemented to be data-t
 
 DList has the the attributes of length and head, which allows for modification of the list within the implementation file. NodeType has the attributes of ItemType info, NodeType<ItemType>* next and back to allow parsing, addition, and removal from the list.
 
-##DList Functions:
+## DList Functions:
 * DList()
 	* this is the constructor for DList objects that set length to 0 and head to null
 * ~DList()
@@ -36,13 +36,13 @@ DList has the the attributes of length and head, which allows for modification o
 * sortList()
 	* moves all doubly-linked list info into a vector, the vector is then sorted using sort( vector.begin(), vector.end() ), the the list is parsed and each node -> info becomes the same index element in the vector
 
-##Purpose
+## Purpose
 The purpose of the Move to the Front algorithm is to show how a doubly-linked list can be implemented in C++, and show the benefits of using pointers and passing-by-reference. The program also helps demonstrate how a doubly-linked list can help improve searching and sorting, by having all addresses in memory directly accessible, and having functions that do each task efficiently and effectively.
 
-##Algorithm Design: Move to the Front
+## Algorithm Design: Move to the Front
 The way the algorithm is implemented is by breaking down each list operation into a function. The way "Move to the Front" is implemented is by checking the list for the item using "inList( item )", and then using "deleteItem( item )" then "insertHead( item )". This avoids duplicates, as well as stopping the algorithm if the item is not found. This saves time and lines of code. 
 
-##Algorithm Design: Client File
+## Algorithm Design: Client File
 The client file is implemented using a main menu function, to continuously show the options menu after each use, and clear the Linux terminal screen after each operation. The client file includes functions that call the implementation file, which keeps client clean and sleek, as one should not care how the functions were implemented in the background.
 
 Obtaining user input is done by taking string input. It then checks if the string input is greater then 1, then lets the user know to enter a char. Once a char is entered, it breaks out of the loop and enters the main program loop. This loop calls the menu, then prompts user input. The input is then linked to a switch statement, then calls the correct function based on that. All of this is in a "do-while" loop until the user enters a case-insensitive 'Q'.

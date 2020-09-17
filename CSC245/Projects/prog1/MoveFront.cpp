@@ -1,3 +1,10 @@
+/* Ronald Karamuca
+ * Project 1: The Move to Front Algorithm
+ * September 15, 2020
+ * Program that handles a doubly linked list 
+ * to do functions such as printing, sorting, and 
+ * accessing data easily
+ */
 #include <iostream>
 #include <string>
 #include <stdlib.h>

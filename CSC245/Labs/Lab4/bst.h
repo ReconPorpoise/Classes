@@ -34,12 +34,13 @@
 	    void postOrder( ) const;
 
             //  Insert Prototype For Height Below	
-
+            int height( ) const;
 
             //  Insert Prototype For NumLeaves Below	
-
+	    int numLeaves( ) const;
 
             //  Insert Prototype For isBalanced Below	
+            bool isBalanced( ) const;
 
             void makeEmpty( );
             void insert( const Comparable & x );
@@ -68,15 +69,14 @@
 
 
             // Insert Private height Prototype Below 
-
+	    int height( BinaryNode<Comparable> *t ) const;
 
 
             // Insert Private numLeaves Prototype Below 
-
-
+	    int numLeaves( BinaryNode<Comparable> *t ) const;
 
             // Insert Private isBalanced Prototype Below 
-
+	    bool isBalanced( BinaryNode<Comparable> *t ) const;
 
 
         };

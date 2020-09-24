@@ -119,33 +119,84 @@
         // Call to height from client -- Acts as a Stub for Private Call 
 	//                              Which Uses Root Ptr 
 
-/*
         template <class Comparable>
         int BinarySearchTree<Comparable>::height( ) const
         {
 
 		// Insert Code Here and Remove Surrounding Comments 
-
+	    if( isEmpty() )
+		return -1;
+	    else 
+		return height( root );
         }
-*/
 
         // Call to height from private -- Accesses the Root Ptr 
 
-/*
- template <class Comparable>
- int BinarySearchTree<Comparable>::height ( BinaryNode<Comparable> *t ) const
- {
-
+	template <class Comparable>
+	int BinarySearchTree<Comparable>::height ( BinaryNode<Comparable> *t ) const
+	{
 		// Insert Code Here and Remove Surrounding Comments 
+	    if( t == NULL )
+		return -1;
+	    
+	    // Keep pushing left and right until, then see if the 
+	    // left height > right height, the return that height + 1
+	    // (starts at 0)
+	    int lheight = height( t -> left ) + 1;
+	    int rheight = height( t -> right ) + 1;
+		
+	    if( lheight >= rheight )
+	    	return lheight;
+	    else
+		return rheight;
+	}
+	
+	template <class Comparable>
+	int BinarySearchTree<Comparable>::numLeaves( ) const
+	{
+	    if( isEmpty() )
+	   	return 0;
+	    else
+		return numLeaves( root );
+	}
 
+	template <class Comparable>
+	int BinarySearchTree<Comparable>::numLeaves ( BinaryNode<Comparable> *t ) const
+	{
+	    // No nodes == no leaf nodes
+	    if( t == NULL )
+		return 0;
+	    // if the left and right child do not exist, node is a leaf
+	    if( t -> left == NULL && t -> right == NULL )
+	        return 1;
+	    // number of left leaves + number of right leaves == total leaves
+	    else
+		return numLeaves( t -> left ) + numLeaves( t -> right );
+	}
 
+	template <class Comparable>
+	bool BinarySearchTree<Comparable>::isBalanced( ) const
+	{
+	    if( isEmpty() )
+		return true;
+	    else
+		return isBalanced( root );
+	}
 
-
-
-
-
- }
-*/
+	template <class Comparable>
+	bool BinarySearchTree<Comparable>::isBalanced( BinaryNode<Comparable> *t ) const
+	{
+	    if( t == NULL )
+		return true;
+	   
+	    int lheight = height( t -> left );
+	    int rheight = height( t -> right );
+	
+	    if( ( lheight - rheight ) <= 1 && isBalanced( t -> left ) && isBalanced( t -> right ) )
+		return true;
+	
+	    return false;  
+	}
 			 
         template <class Comparable>
         const BinarySearchTree<Comparable> &

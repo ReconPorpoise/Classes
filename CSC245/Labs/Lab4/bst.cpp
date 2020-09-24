@@ -192,6 +192,9 @@
 	    int lheight = height( t -> left );
 	    int rheight = height( t -> right );
 	
+	    // if the left and right heights differ by no more than one
+	    // and it is balanced on every left and right node as well,
+	    // the tree is balanced
 	    if( ( lheight - rheight ) <= 1 && isBalanced( t -> left ) && isBalanced( t -> right ) )
 		return true;
 	

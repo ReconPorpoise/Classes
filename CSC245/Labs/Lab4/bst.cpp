@@ -97,10 +97,10 @@
         template <class Comparable>
         void BinarySearchTree<Comparable>::postOrder( ) const
         {
-
-
-
-
+	    if( isEmpty() )
+		cout << "Empty tree" << endl;
+	    else
+		postOrder( root );
         }
 
         // Call to postOrder from private -- Accesses the Root Ptr 
@@ -108,10 +108,12 @@
         template <class Comparable>
         void BinarySearchTree<Comparable>::postOrder( BinaryNode<Comparable> *t ) const
         {
-
-
-
-
+	    if( t != NULL ) 
+	    {
+		postOrder( t -> left );
+		postOrder( t -> right );
+		cout << t -> element << endl;
+	    }
         }
 
         // Call to height from client -- Acts as a Stub for Private Call 

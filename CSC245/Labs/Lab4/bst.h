@@ -31,7 +31,7 @@
             void printTree( ) const;
 
             //  Insert Prototype For PostOrder Below
-
+	    void postOrder( ) const;
 
             //  Insert Prototype For Height Below	
 
@@ -64,7 +64,7 @@
             void printTree( BinaryNode<Comparable> *t ) const;
 
             // Insert Private postOrder Prototype Below 
-
+	    void postOrder( BinaryNode<Comparable> *t ) const;
 
 
             // Insert Private height Prototype Below 

@@ -1,5 +1,6 @@
         #include <iostream>
         #include <cstdlib>
+		#include <cmath>
         using namespace std;
 
         template <class Comparable>
@@ -195,7 +196,7 @@
 	    // if the left and right heights differ by no more than one
 	    // and it is balanced on every left and right node as well,
 	    // the tree is balanced
-	    if( ( lheight - rheight ) <= 1 && isBalanced( t -> left ) && isBalanced( t -> right ) )
+	    if( abs(( lheight - rheight )) <= 1 && isBalanced( t -> left ) && isBalanced( t -> right ) )
 		return true;
 	
 	    return false;  

@@ -36,8 +36,8 @@ int main()
 	t.insert( 9 );
 	balanced = t.isBalanced();
 	if( balanced == false )
-		cout << "\nTree is not balanced" << endl;
+		cout << "\nTree is not balanced after inserting 9" << endl;
 	else 
-		cout << "\nTree is balanced" << endl;
+		cout << "\nTree is balanced after inserting 9" << endl;
 	return 0;
 }

@@ -11,7 +11,7 @@ BET::BET()
 
 BET::~BET()
 {
-
+    makeEmpty( root );
 }
 
 bool BET::isEmpty() const 
@@ -36,39 +36,32 @@ void BET::makeEmpty( BETPtr& t ) const
 
 void BET::insertPrefixOperator( char token )
 {
-    if( root == NULL ) {
-
-    }
-    else {
-
-    }    
+    
 }
 
 void BET::insertPostfixOperator( char token )
 {
+    BETPtr op = new BinaryNode;
     int s1 = s.top();   s.pop();
     int s2 = s.top();   s.pop();
-    int result;
-    if( token == '+' )
-        result = s2 + s1;        
-    if( token == '-' ) 
-        result = s2 - s1;
-    if( token == '*' )
-        result = s2 * s1;
-    if( token == '/' ) 
-        result = s2 / s1;
-    s.push( result );
+    
 }
 
 void BET::insertOperand( char token )
 {
-    if( token == OPERAND ) 
-        s.push( token );
+    BETPtr op = new BinaryNode;
+    if( root == NULL )
+        root = op;
+
+    op -> left = NULL;
+    op -> right = NULL;
+
+    s.push( op );
 }
 
 void BET::preorder() const 
 {
-    
+    preorder( root );
 }
 
 void BET::preorder( BETPtr t ) const 
@@ -78,7 +71,7 @@ void BET::preorder( BETPtr t ) const
 
 void BET::inorder() const
 {
-
+    inorder( root );
 }
 
 void BET::inorder( BETPtr t ) const
@@ -88,7 +81,7 @@ void BET::inorder( BETPtr t ) const
 
 void BET::postorder() const
 {
-
+    postorder( root );
 }
 
 void BET::postorder( BETPtr t ) const

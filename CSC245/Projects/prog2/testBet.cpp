@@ -14,7 +14,6 @@ BET inBuild( string input );
 bool precedence( char prevOp, char currOp );
 void printMenu();
 void print( BET tree );
-string removeSpaces( string rawExpression );
 
 int main() 
 {
@@ -170,13 +169,16 @@ bool precedence( char prevOp, char currOp )
 void printMenu() 
 {
 	int type;
-	string expression;
+	string expression = "";
 
 	cout << "---------- Building Binary Expression Trees ----------" << endl;
 	cout << "      (1) Prefix      (2) Infix      (3) Postfix      " << endl;
 	
-	cout << "\nYour Expression Type: ";		cin >> type;
-	cout << "Your Expression: ";			cin >> expression;
+	cout << "\nYour Expression Type: ";		
+	cin >> type;
+	cout << "Your Expression: ";			
+	cin >> expression;
+	
 	cout << endl;
 
 	// Calls for the preorder, inorder, and postorder expressions to be printed based upon the user's original input.

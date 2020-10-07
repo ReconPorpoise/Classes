@@ -42,7 +42,7 @@ void printMenu()
 	
 	if( type == 3 ) {
 		exTree = postBuild( expression, exTree );
-		exTree.preorder();
+		exTree.postorder();
 	}
 }
 

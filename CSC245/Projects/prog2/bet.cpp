@@ -1,5 +1,4 @@
 #include <iostream>
-#include "stack.h"
 #include "bet.h"
 
 using namespace std;
@@ -29,7 +28,7 @@ void BET::makeEmpty( BETPtr& t ) const
     if( t != NULL ) {
         makeEmpty( t -> left );
         makeEmpty( t -> right );
-        delete t;
+		delete t;
 		t = NULL;
     }
 }
@@ -65,12 +64,12 @@ void BET::insertPostfixOperator( char token )
 void BET::insertOperand( char token )
 {
     BETPtr op = new BinaryNode;
-	
-	op->left = NULL;
-	op->right = NULL;
 
 	op->info.whichType = OPERAND;
 	op->info.theContent.variable = token;
+
+	op->left = NULL;
+	op->right = NULL;
 
     s.push( op );
 }

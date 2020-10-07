@@ -1,4 +1,4 @@
-#include <stack> 
+#include "stack.h"
 
 enum OpType {OPERATOR, OPERAND};
 union OperandType
@@ -43,7 +43,7 @@ public :
 private :
     // Private Attributes of a BET Object 
     BETPtr root;
-    stack<BETPtr> s;
+    Stack<BETPtr> s;
 
     // Operations needed solely by Public Functions
     void makeEmpty( BETPtr& t ) const;

@@ -4,6 +4,7 @@
  */
 
 #include <iostream>
+#include <algorithm>
 #include <string>
 #include "bet.h"
 using namespace std;
@@ -169,7 +170,7 @@ bool precedence( char prevOp, char currOp )
 void printMenu() 
 {
 	int type;
-	string expression = "";
+	string expression;
 
 	cout << "---------- Building Binary Expression Trees ----------" << endl;
 	cout << "      (1) Prefix      (2) Infix      (3) Postfix      " << endl;
@@ -177,8 +178,11 @@ void printMenu()
 	cout << "\nYour Expression Type: ";		
 	cin >> type;
 	cout << "Your Expression: ";			
-	cin >> expression;
-	
+	cin.ignore();
+	getline( cin, expression );
+
+	expression.erase( remove( expression.begin(), expression.end(), ' ' ), expression.end() );
+
 	cout << endl;
 
 	// Calls for the preorder, inorder, and postorder expressions to be printed based upon the user's original input.
@@ -186,11 +190,14 @@ void printMenu()
 	if( type == 1 ) {
 		print( preBuild( expression ) );
 	}
-	if( type == 2 ) {
+	else if( type == 2 ) {
 		print( inBuild( expression ) );
 	}
-	if( type == 3 ) {
+	else if( type == 3 ) {
 		print( postBuild( expression ) );
+	}
+	else {
+		cout << "Invalid input." << endl;
 	}
 }
 

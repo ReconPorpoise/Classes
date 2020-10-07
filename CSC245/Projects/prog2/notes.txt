@@ -1,3 +1,0 @@
-c++ -c bet.cpp
-bet.cpp and client #include bet.h
-c++ client.cpp bet.o 

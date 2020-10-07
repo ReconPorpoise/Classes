@@ -196,9 +196,6 @@ void printMenu()
 	else if( type == 3 ) {
 		print( postBuild( expression ) );
 	}
-	else {
-		cout << "Invalid input." << endl;
-	}
 }
 
 void print( BET tree )

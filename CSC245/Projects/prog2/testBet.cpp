@@ -26,7 +26,7 @@ int main()
 	
 	// Runs until user decides to quit, then a deconstruct message appears
 	while( answer != 'n' ) {
-		cout << "Would you like to build another tree? (y/n): ";
+		cout << "\n\n\nWould you like to build another tree? (y/n): ";
 		cin >> again;
 		if( again.length() > 1 ) {
 			while( again.length() > 1 ) {

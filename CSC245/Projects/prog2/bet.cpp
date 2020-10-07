@@ -1,5 +1,5 @@
 #include <iostream>
-#include <stack>
+#include "stack.h"
 #include "bet.h"
 
 using namespace std;
@@ -30,31 +30,47 @@ void BET::makeEmpty( BETPtr& t ) const
         makeEmpty( t -> left );
         makeEmpty( t -> right );
         delete t;
+		t = NULL;
     }
-    t = NULL;
 }
 
 void BET::insertPrefixOperator( char token )
 {
-    
+	BETPtr op = new BinaryNode;
+
+	op->right = s.top();	s.pop();
+	op->left = s.top();		s.pop();
+
+	op->info.whichType = OPERATOR;
+	op->info.theContent.opsymbol = token;
+	
+	s.push( op );   
+	root = op;
 }
 
 void BET::insertPostfixOperator( char token )
 {
     BETPtr op = new BinaryNode;
-    int s1 = s.top();   s.pop();
-    int s2 = s.top();   s.pop();
     
+	op->left = s.top();		s.pop();
+	op->right = s.top();	s.pop();
+	
+	op->info.whichType = OPERATOR;
+	op->info.theContent.opsymbol = token;
+
+	s.push( op );
+	root = op;
 }
 
 void BET::insertOperand( char token )
 {
     BETPtr op = new BinaryNode;
-    if( root == NULL )
-        root = op;
+	
+	op->left = NULL;
+	op->right = NULL;
 
-    op -> left = NULL;
-    op -> right = NULL;
+	op->info.whichType = OPERAND;
+	op->info.theContent.variable = token;
 
     s.push( op );
 }
@@ -66,7 +82,16 @@ void BET::preorder() const
 
 void BET::preorder( BETPtr t ) const 
 {
-
+	if( t == NULL )
+		return;
+	
+	if( t->info.whichType == OPERAND ) 
+		cout << t->info.variable << endl;
+	if( t->info.whichType == OPERATOR )
+		cout << t->info.opsymbol;
+	
+	preorder( t->left );
+	preorder( t->right );
 }
 
 void BET::inorder() const
@@ -76,7 +101,17 @@ void BET::inorder() const
 
 void BET::inorder( BETPtr t ) const
 {
-
+	if( t == NULL )
+		return;
+	
+	inorder( t->left );
+	
+	if( t->info.whichType == OPERAND ) 
+		cout << t->info.variable << endl;
+	if( t->info.whichType == OPERATOR )
+		cout << t->info.opsymbol;
+	
+	inorder( t->right );
 }
 
 void BET::postorder() const
@@ -86,5 +121,14 @@ void BET::postorder() const
 
 void BET::postorder( BETPtr t ) const
 {
+	if( t == NULL )
+		return;
 
+	postorder( t->left );
+	postorder( t->right );
+	
+	if( t->info.whichType == OPERAND ) 
+		cout << t->info.variable << endl;
+	if( t->info.whichType == OPERATOR )
+		cout << t->info.opsymbol;
 }

@@ -122,29 +122,33 @@ bool precedence( char prevOp, char currOp )
 
 void printMenu() 
 {
-	int type;
-	string expression;
+	string again = "y";
+	while( tolower( again[ 0 ] ) != 'n' ) {
+		int type;
+		string expression;
 
-	cout << "---------- Building Binary Expression Trees ----------" << endl;
-	cout << "      (1) Prefix      (2) Infix      (3) Postfix      " << endl;
-	
-	cout << "\nYour Expression Type: ";		cin >> type;
-	cout << "\nYour Expression: ";			cin >> expression;
-	
-	if( type == 1 ) {
-		print( preBuild( expression ) );
-	}
-	if( type == 2 ) {
-		print( inBuild( expression ) );
-	}
-	if( type == 3 ) {
-		print( postBuild( expression ) );
+		cout << "---------- Building Binary Expression Trees ----------" << endl;
+		cout << "      (1) Prefix      (2) Infix      (3) Postfix      " << endl;
+		
+		cout << "\nYour Expression Type: ";		cin >> type;
+		cout << "Your Expression: ";			cin >> expression;
+		cout << endl;
+
+		if( type == 1 ) {
+			print( preBuild( expression ) );
+		}
+		if( type == 2 ) {
+			print( inBuild( expression ) );
+		}
+		if( type == 3 ) {
+			print( postBuild( expression ) );
+		}
 	}
 }
 
 void print( BET tree )
 {
-	cout << "Preorder: "; tree.preorder(); cout << endl;
-	cout << "Inorder: "; tree.inorder(); cout << endl;
-	cout << "Postorder: "; tree.postorder(); cout << endl;
+	cout << "Preorder Expression Produced from Tree:\n"; tree.preorder(); cout << endl;
+	cout << "Inorder Expression Produced from Tree:\n"; tree.inorder(); cout << endl;
+	cout << "Postorder Expression Produced from Tree:\n"; tree.postorder(); cout << endl;
 }	

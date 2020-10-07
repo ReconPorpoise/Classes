@@ -5,6 +5,8 @@ using namespace std;
 
 BET postBuild( string input);
 BET preBuild( string input );
+BET inBuild( string input );
+bool precedence( char prevOp, char currOp );
 void printMenu();
 void print( BET tree );
 
@@ -45,6 +47,79 @@ BET preBuild( string input )
 	return tree;
 }
 
+BET inBuild( string input ) 
+{
+	Stack<char> s;
+	string postfix = "";
+	char curr;
+
+	/*
+	int lcounter = 0;
+	int rcounter = 0;
+
+	for( int i = 0; i < input.length(); i++ ) {
+		if( input[ i ] == '(' )
+			lcounter++;
+		if( input[ i ] == ')' )
+			rcounter++;
+	}
+	
+	while( rcounter > lcounter ) {
+		input = '(' + input;
+		lcounter++;
+	}
+
+	while( lcounter > rcounter ) {
+		input += ')';
+		rcounter++;
+	}
+	*/
+
+	input = '(' + input;
+	input += ')';
+
+	for( int i = 0; i < input.length(); i++ ) {
+		curr = input[ i ];
+		if( curr == '(' ) {
+			s.push( curr );
+		}
+		else if( curr == '+' || curr == '-' || curr == '*' || curr == '/' ) {
+			while( precedence( s.top(), curr ) ) {
+				postfix += s.top();
+				s.pop();
+			}
+			s.push( curr );
+		}
+		else if( curr == ')' ) {
+			while( s.top() != '(' ) {
+				postfix += s.top();
+				s.pop();
+			}
+			s.pop();
+		}
+		else {
+			postfix += curr;
+		}
+	}
+	return( postBuild( postfix ) );
+}
+
+bool precedence( char prevOp, char currOp )
+{
+	if( ( prevOp == '*' || prevOp == '/' ) && ( currOp == '*' || currOp == '/'  ) ) {
+		return true;
+	}
+	if( ( prevOp == '+' || prevOp == '-' ) && ( currOp == '+' || currOp == '-'  ) ) {
+		return true;
+	}
+	if( ( prevOp == '*' || prevOp == '/' ) && ( currOp == '+' || currOp == '-'  ) ) {
+		return true;
+	}
+	else {
+		return false;
+	}
+}
+
 void printMenu() 
 {
 	int type;
@@ -60,7 +135,7 @@ void printMenu()
 		print( preBuild( expression ) );
 	}
 	if( type == 2 ) {
-		
+		print( inBuild( expression ) );
 	}
 	if( type == 3 ) {
 		print( postBuild( expression ) );

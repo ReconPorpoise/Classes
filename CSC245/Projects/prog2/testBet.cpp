@@ -3,9 +3,10 @@
 #include "bet.h"
 using namespace std;
 
-BET postBuild( string input, BET tree );
-BET preBuild( string input, BET tree );
+BET postBuild( string input);
+BET preBuild( string input );
 void printMenu();
+void print( BET tree );
 
 int main() 
 {
@@ -14,8 +15,9 @@ int main()
 	return 0;
 }
 
-BET postBuild( string input, BET tree )
+BET postBuild( string input )
 {
+	BET tree = BET();
 	for( int i = 0; i < input.length(); i++ ) {
 		if( input[ i ] == '+' || input[ i ] == '-' || input[ i ] == '*' || 
 			input[ i ] == '/' ) {
@@ -28,9 +30,23 @@ BET postBuild( string input, BET tree )
 	return tree;
 }
 
+BET preBuild( string input ) 
+{
+	BET tree = BET();
+	for( int i = input.length() - 1; i >= 0; i-- ) {
+		if( input[ i ] == '+' || input[ i ] == '-' || input[ i ] == '*' || 
+			input[ i ] == '/' ) {
+			tree.insertPrefixOperator( input[ i ] );
+		}
+		else {
+			tree.insertOperand( input[ i ] );
+		}
+	}
+	return tree;
+}
+
 void printMenu() 
 {
-	BET exTree = BET();
 	int type;
 	string expression;
 
@@ -40,9 +56,20 @@ void printMenu()
 	cout << "\nYour Expression Type: ";		cin >> type;
 	cout << "\nYour Expression: ";			cin >> expression;
 	
+	if( type == 1 ) {
+		print( preBuild( expression ) );
+	}
+	if( type == 2 ) {
+		
+	}
 	if( type == 3 ) {
-		exTree = postBuild( expression, exTree );
-		exTree.postorder();
+		print( postBuild( expression ) );
 	}
 }
 
+void print( BET tree )
+{
+	cout << "Preorder: "; tree.preorder(); cout << endl;
+	cout << "Inorder: "; tree.inorder(); cout << endl;
+	cout << "Postorder: "; tree.postorder(); cout << endl;
+}	

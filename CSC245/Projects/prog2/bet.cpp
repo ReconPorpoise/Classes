@@ -37,8 +37,8 @@ void BET::insertPrefixOperator( char token )
 {
 	BETPtr op = new BinaryNode;
 
-	op->right = s.top();	s.pop();
-	op->left = s.top();		s.pop();
+	op->left = s.top();	s.pop();
+	op->right = s.top();		s.pop();
 
 	op->info.whichType = OPERATOR;
 	op->info.theContent.opsymbol = token;
@@ -51,8 +51,8 @@ void BET::insertPostfixOperator( char token )
 {
     BETPtr op = new BinaryNode;
     
-	op->left = s.top();		s.pop();
-	op->right = s.top();	s.pop();
+	op->right = s.top();		s.pop();
+	op->left = s.top();	s.pop();
 	
 	op->info.whichType = OPERATOR;
 	op->info.theContent.opsymbol = token;
@@ -85,7 +85,7 @@ void BET::preorder( BETPtr t ) const
 		return;
 	
 	if( t->info.whichType == OPERAND ) 
-		cout << t->info.theContent.variable << endl;
+		cout << t->info.theContent.variable;
 	if( t->info.whichType == OPERATOR )
 		cout << t->info.theContent.opsymbol;
 	
@@ -106,7 +106,7 @@ void BET::inorder( BETPtr t ) const
 	inorder( t->left );
 	
 	if( t->info.whichType == OPERAND ) 
-		cout << t->info.theContent.variable << endl;
+		cout << t->info.theContent.variable;
 	if( t->info.whichType == OPERATOR )
 		cout << t->info.theContent.opsymbol;
 	
@@ -122,12 +122,12 @@ void BET::postorder( BETPtr t ) const
 {
 	if( t == NULL )
 		return;
-
+	
 	postorder( t->left );
 	postorder( t->right );
 	
 	if( t->info.whichType == OPERAND ) 
-		cout << t->info.theContent.variable << endl;
+		cout << t->info.theContent.variable;
 	if( t->info.whichType == OPERATOR )
 		cout << t->info.theContent.opsymbol;
 }

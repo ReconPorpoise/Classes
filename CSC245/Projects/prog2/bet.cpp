@@ -86,9 +86,9 @@ void BET::preorder( BETPtr t ) const
 		return;
 	
 	if( t->info.whichType == OPERAND ) 
-		cout << t->info.variable << endl;
+		cout << t->info.theContent.variable << endl;
 	if( t->info.whichType == OPERATOR )
-		cout << t->info.opsymbol;
+		cout << t->info.theContent.opsymbol;
 	
 	preorder( t->left );
 	preorder( t->right );
@@ -107,9 +107,9 @@ void BET::inorder( BETPtr t ) const
 	inorder( t->left );
 	
 	if( t->info.whichType == OPERAND ) 
-		cout << t->info.variable << endl;
+		cout << t->info.theContent.variable << endl;
 	if( t->info.whichType == OPERATOR )
-		cout << t->info.opsymbol;
+		cout << t->info.theContent.opsymbol;
 	
 	inorder( t->right );
 }
@@ -128,7 +128,7 @@ void BET::postorder( BETPtr t ) const
 	postorder( t->right );
 	
 	if( t->info.whichType == OPERAND ) 
-		cout << t->info.variable << endl;
+		cout << t->info.theContent.variable << endl;
 	if( t->info.whichType == OPERATOR )
-		cout << t->info.opsymbol;
+		cout << t->info.theContent.opsymbol;
 }

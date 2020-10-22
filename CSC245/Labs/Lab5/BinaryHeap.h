@@ -1,5 +1,5 @@
 	using namespace std;
-        #include "dsexceptions.h"
+  #include "dsexceptions.h"
 	#include <vector>
 
         template <class Comparable>
@@ -12,14 +12,17 @@
             bool isFull( ) const;
             const Comparable & findMin( );
 
-            // const Comparable & findMax( );
+            const Comparable & findMax( );
 
-	    // int Height () const;	
+	          int Height () const;	
 
             void insert( const Comparable & x );
             void deleteMin( );
             void deleteMin( Comparable & minItem );
             void makeEmpty( );
+            void printLtSubtree( ) {
+              printLtSubtree( 2 );
+            };
 
           private:
             int                currentSize;  // Number of elements in heap
@@ -27,7 +30,7 @@
 
             void buildHeap( );
             void percolateDown( int hole );
-            // void printLtSubtree (int i);
+            void printLtSubtree (int i);
         };
 
         #include "BinaryHeap.cpp"

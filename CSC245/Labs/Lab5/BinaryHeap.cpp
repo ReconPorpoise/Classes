@@ -27,42 +27,47 @@
             return array[ 1 ];
         }
 
-/*
 	template <class Comparable>
 	const Comparable & BinaryHeap<Comparable>::findMax( ) 
 	{
 
 		// INSERT CODE FOR findMax HERE
+        int loc = int ( pow ( 2.0, Height( ) ) );
+        int maxLoc = loc;
+        loc++;
 
-
-	} 
-*/
-
-
-/*
-	template <class Comparable>
-        void BinaryHeap<Comparable> :: printLtSubtree(int i) 
-	{
-
-		// INSERT CODE for printLtSubtree HERE
-
-
-
-	}
-*/
-
-
-/*
-        template <class Comparable>
-       	int BinaryHeap<Comparable> :: Height() const
-	{
-
-		// INSERT CODE for Height HERE
-
-
-
+        while( loc <= currentSize ) {
+            if( array[ loc ] > array[ maxLoc ] )
+                maxLoc = loc;
+            loc++;
         }
-*/
+
+        return array[ maxLoc ];
+	} 
+
+	template <class Comparable>
+    void BinaryHeap<Comparable> :: printLtSubtree(int i) 
+	{
+		// INSERT CODE for printLtSubtree HERE
+        if( i <= currentSize ) {
+            cout << array[ i ] << " "; 
+            printLtSubtree( i * 2);
+            printLtSubtree( ( i * 2 ) + 1 );
+        }
+	}
+
+    template <class Comparable>
+    int BinaryHeap<Comparable> :: Height() const
+	{
+
+	    // INSERT CODE for Height HERE
+        int height = -1;
+        
+        while( pow( 2, height + 1 ) - 1 < currentSize )
+            height++;
+
+        return height;
+    }
 		
         template <class Comparable>
         void BinaryHeap<Comparable>::deleteMin( )

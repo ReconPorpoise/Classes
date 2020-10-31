@@ -37,11 +37,11 @@ void decode( string file )
 		// all pairs have a space between, so if there is a space...
 		// split the string. The left side is the ascii and the right
 		// is the encoding for the character	
-		int space = encoded.find(' ');
+		int space = encoded.find( ' ' );
 		if( space != -1 ) {
 			string asciiStr = encoded.substr( 0, space );
 			string encoding = encoded.substr( space + 1 );
-			int ascii = stoi(asciiStr);
+			int ascii = stoi( asciiStr );
 
 			// add the pair to the map so we can find and add ascii characters
 			// using the encoding found in the last line of the input file

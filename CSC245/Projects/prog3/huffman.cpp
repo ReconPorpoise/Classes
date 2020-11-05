@@ -15,7 +15,6 @@ void HuffmanTree:: insert(char ch, int weight) {
 
 bool HuffmanTree:: inTree(char ch) {
 
-
 }
 
 int HuffmanTree:: GetFrequency(char ch) {

@@ -9,7 +9,7 @@ using namespace std;
 void fileCheck( int argl, char** args );
 void insertNodes( string fileName, int Letters[ ], HuffmanTree tree, string flag );
 void printHelp( );
-void createNewFile( HuffmanTree tree, string fileName );
+void createNewFile( HuffmanTree tree, string fileName, int Letters[ ]);
 //void PrintLetters ( const int Letters[ ] );
 
 const int NumLetters = 256;
@@ -123,10 +123,10 @@ void insertNodes( string fileName, int Letters[ ], HuffmanTree tree, string flag
     if( flag == "--t" )
         tree.PrintTable();
 
-    createNewFile( tree, fileName );
+    createNewFile( tree, fileName, Letters );
 }
 
-void createNewFile( HuffmanTree tree, string fileName ) {
+void createNewFile( HuffmanTree tree, string fileName, int Letters[ ] ) {
 	string newFile = fileName + ".zip";
 	ofstream outFile( newFile );
     string encoded = "";
@@ -135,10 +135,13 @@ void createNewFile( HuffmanTree tree, string fileName ) {
     infile.open( fileName );
     string curr;
     
+    int numChar = ( tree.numNodes() + 1 ) / 2;
+    outFile << numChar << endl;
+
     while( getline( infile, curr ) ) 
         for( int i = 0; i < curr.length(); i++ )
             encoded += tree.GetCode( curr[ i ] );
             
-    outFile << encoded << endl;
+    outFile << encoded;
 	outFile.close();
 }

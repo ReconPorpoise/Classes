@@ -6,46 +6,49 @@
 #include "huffman.h"
 using namespace std;
 
+bool fileCheck( char** args );
 void insertNodes( string fileName, int Letters[ ], HuffmanTree tree );
 //void PrintLetters ( const int Letters[ ] );
 
 const int NumLetters = 256;
 
-int main( int argc, char* argv[ ] )
+int main( int argc, char** argv )
 {
-    HuffmanTree tree;
+    fileCheck( argv );
+
+    //insertNodes( fileName, Letters, tree );
+    return 0;
+}
+
+bool fileCheck( char** args ) {
     string fileName;
-    if( argv[ 2 ] != NULL ) {
+    HuffmanTree tree;
+    int Letters[ NumLetters ];
+
+    if( args[ 2 ] != NULL ) {
         // Remove all spaces from the argument
-        string flag = argv[ 1 ];
+        string flag = args[ 1 ];
         for( int i = 0; i < flag.length(); i++ ) {
             if( flag[ i ] == ' ' ) {
                 flag.erase( i, 1 );
             }      
         }
+
         // if they want the table printed or a help option, catch it and respond accordingly
         if( flag == "--t" )
-            //do smthing
-            cout << endl;  
+            // do smthing
+            cout << endl;
         else if( flag == "help" )
             //do smthing
             cout << endl;
         else 
-            //dosmthing
-            cout << endl;
-        fileName = argv[ 2 ];
+            cout << "Incorrect flag. Try again." << endl;
+        fileName = args[ 2 ];
     }
     // if there is only one argument then they must have only input the file name
-    else if( argv[ 1 ] != NULL ) {
-        fileName = argv[ 1 ];
+    else if( args[ 1 ] != NULL ) {
+        fileName = args[ 1 ];
     }
-    
-    // gets frequencies for each character in the file 
-    int Letters[NumLetters]; 
-	insertNodes( fileName, Letters, tree );
-	//PrintLetters ( Letters );
-    
-    return 0;
 }
 
 void insertNodes( string fileName, int Letters[ ], HuffmanTree tree )
@@ -73,5 +76,6 @@ void insertNodes( string fileName, int Letters[ ], HuffmanTree tree )
         if( Letters[ ch ] != 0 ) 
             tree.insert( ch, Letters[ ch ] );
 
+    // build the tree with inserted nodes
     tree.build();
 }

@@ -50,5 +50,6 @@ int HuffmanTree:: numNodes() {
 // builds the tree using the vector
 void HuffmanTree:: build() {
     for( int i = 0; i < sizeof(nodes); i++ )
-        cout << nodes[i].ch << endl;
+        if( nodes[ i ].ch != 0 )
+            cout << "Letter printed: " << int(nodes[i].ch) << endl;
 }

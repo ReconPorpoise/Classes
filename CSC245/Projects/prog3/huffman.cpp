@@ -5,14 +5,15 @@ using namespace std;
 HuffmanTree:: HuffmanTree()
 	: numChars(0), built(false) {}
 
+// pushes nodes to a vector
 void HuffmanTree:: insert(char ch, int weight) {
     HNode newNode = {ch, weight, -1, -1}; 
     built = false;
     nodes.push_back(newNode);
     numChars++;
-
 }
 
+/*
 bool HuffmanTree:: inTree(char ch) {
 
 }
@@ -45,7 +46,9 @@ void HuffmanTree:: PrintTable() {
 int HuffmanTree:: numNodes() {
 
 }
-
+*/
+// builds the tree using the vector
 void HuffmanTree:: build() {
-
+    for( int i = 0; i < sizeof(nodes); i++ )
+        cout << nodes[i].ch << endl;
 }

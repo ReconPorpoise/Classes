@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <fstream>
 #include <iostream>
 #include <cctype>
@@ -5,8 +6,8 @@
 #include "huffman.h"
 using namespace std;
 
-void CountLetters ( string fileName, int Letters[ ] );
-void PrintLetters ( const int Letters[ ] );
+void insertNodes( string fileName, int Letters[ ], HuffmanTree tree );
+//void PrintLetters ( const int Letters[ ] );
 
 const int NumLetters = 256;
 
@@ -39,15 +40,15 @@ int main( int argc, char* argv[ ] )
         fileName = argv[ 1 ];
     }
     
+    // gets frequencies for each character in the file 
     int Letters[NumLetters]; 
-
-	CountLetters ( fileName, Letters );
-	PrintLetters ( Letters );
-
+	insertNodes( fileName, Letters, tree );
+	//PrintLetters ( Letters );
+    
     return 0;
 }
 
-void CountLetters ( string fileName, int Letters[ ] )
+void insertNodes( string fileName, int Letters[ ], HuffmanTree tree )
 {
 	char ch;
 
@@ -57,16 +58,27 @@ void CountLetters ( string fileName, int Letters[ ] )
 	ifstream infile;
     infile.open( fileName );
     
+    // gets weight of each letter in the alphabet
     string curr;
     while( getline( infile, curr ) ) {
-        for( int i = 0; i < curr.length(); i++ ) {
+        // if it's in the string, increment its count in the array
+        for( int i = 0; i < curr.length(); i++ )
             Letters[ curr[ i ] ]++;
-        }
         Letters[ '\n' ]++;
     }
+
+    // if the number exists, insert that node into the Huffman Tree
+    for( char ch = char( 0 ); ch <= char( 126 ); ch++ ) {
+        if( Letters[ ch ] > 0 ) {
+            tree.insert( ch, Letters[ ch ] );
+        }
+    }
+
+    tree.build();
+
 }
 
-
+/*
 void PrintLetters ( const int Letters[ ] )
 {
 	for (char ch = char(0);  ch <= char(126);  ch++)
@@ -77,3 +89,4 @@ void PrintLetters ( const int Letters[ ] )
 	  else if ( (Letters[ch] != 0) && (ch == ' ') )
 	    cout << "Char sp appearances : " << Letters[ch] << endl;
 }
+*/

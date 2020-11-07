@@ -91,6 +91,7 @@ void printHelp( ) {
     while( getline( helpFile, curr ) ) {
         cout << curr << endl;
     }
+    helpFile.close();
 }
 
 void insertNodes( string fileName, int Letters[ ], HuffmanTree tree, string flag )
@@ -104,14 +105,14 @@ void insertNodes( string fileName, int Letters[ ], HuffmanTree tree, string flag
 	ifstream infile;
     infile.open( fileName );
     
+    char curr;
+    infile.get( curr );
     // gets weight of each letter in the alphabet
-    string curr;
-    while( getline( infile, curr ) ) {
-        // if it's in the string, increment its count in the array
-        for( int i = 0; i < curr.length(); i++ )
-            Letters[ curr[ i ] ]++;
-        Letters[ '\n' ]++;
+    while( infile ) {
+        Letters[ curr ]++;
+        infile.get( curr );
     }
+    infile.close();
 
     // if the number exists, insert that node into the Huffman Tree
     for( char ch = char( 0 ); ch <= char( 126 ); ch++ )
@@ -133,8 +134,7 @@ void createNewFile( HuffmanTree tree, string fileName, int Letters[ ] ) {
 
     ifstream infile;
     infile.open( fileName );
-    string curr;
-    
+
     int numChar = ( tree.numNodes() + 1 ) / 2;
     outFile << numChar << endl;
 
@@ -142,10 +142,14 @@ void createNewFile( HuffmanTree tree, string fileName, int Letters[ ] ) {
         if( Letters[ ch ] != 0 ) 
             outFile << int( ch ) << " " << tree.GetCode( ch ) << endl;
 
-    while( getline( infile, curr ) ) 
-        for( int i = 0; i < curr.length(); i++ )
-            encoded += tree.GetCode( curr[ i ] );
-            
+    char ch;
+    infile.get( ch );
+    while( infile ) {
+        encoded += tree.GetCode( ch );
+        infile.get( ch );
+    }
+    infile.close();
+
     outFile << encoded;
 	outFile.close();
 }

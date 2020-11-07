@@ -47,6 +47,8 @@ string HuffmanTree:: GetCode(int i) {
 
 void HuffmanTree:: PrintTable() {
     int numT = 1;
+    cout << "\n       Encoding Table for Zipping\n" << endl;
+    cout << "Index\tChar\tWeight\tParent\tChildType\n" << endl;
     for( int i = 0; i < nodes.size(); i++ ) {
         if( nodes[ i ].ch == '\n' ) 
             cout << i << '\t' << "nl" << '\t' << nodes[ i ].weight << '\t' << nodes[ i ].parent << '\t' << nodes[ i ].childType << endl;

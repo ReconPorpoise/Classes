@@ -138,6 +138,10 @@ void createNewFile( HuffmanTree tree, string fileName, int Letters[ ] ) {
     int numChar = ( tree.numNodes() + 1 ) / 2;
     outFile << numChar << endl;
 
+    for( char ch = char( 0 ); ch <= char( 126 ); ch++ )
+        if( Letters[ ch ] != 0 ) 
+            outFile << int( ch ) << " " << tree.GetCode( ch ) << endl;
+
     while( getline( infile, curr ) ) 
         for( int i = 0; i < curr.length(); i++ )
             encoded += tree.GetCode( curr[ i ] );

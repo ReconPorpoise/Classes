@@ -64,6 +64,7 @@ void HuffmanTree:: PrintTable() {
         else 
             cout << i << '\t' << nodes[ i ].ch << '\t' << nodes[ i ].weight << '\t' << nodes[ i ].parent << '\t' << nodes[ i ].childType << endl;
     }
+    cout << endl;
 }
 
 int HuffmanTree:: numNodes() {

@@ -8,8 +8,26 @@ void decode( string file );
 
 int main( int argc, char* argv[ ] )
 {
-	// get name of compressed file from command line arguments
-	string fileName = argv[ 1 ];
+	string fileName;
+	
+	// checks for no command line arguments
+	if( argv[ 1 ] != NULL )
+		fileName = argv[ 1 ];
+	// if nothing, print out a message and kill unzip
+	else {
+		cout << "Bad input. Try again." << endl;
+		return 0;
+	}
+
+	// otherwise, check if the file exists then let them know		
+	ifstream infile;
+	infile.open( fileName );
+	if( !infile ) {
+		cout << "File " << fileName << " does not exist. Try again." << endl;
+		return 0;
+	}
+	infile.close();
+
 	decode( fileName );
 	
 	return 0;

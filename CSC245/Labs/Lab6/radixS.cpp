@@ -4,16 +4,16 @@
 #include <vector>
 using namespace std;
 
-int maxElemLength( const vector<int>& v );
-int GetDigit( int number, int k );
-vector<queue<int> > ItemsToQueues( const vector< int >& L, int k );
-vector<int> QueuesToArray( vector<queue<int> >& QA, int numVals );
-void RadixSort( vector<int>& L, int numDigits );
-void PrintVector( const vector<int>& L ); 
+int maxElemLength( const vector<string>& v );
+char GetChar( string word, int k );
+vector<queue<string> > ItemsToQueues( const vector< string >& L, int k );
+vector<string> QueuesToArray( vector<queue<string> >& QA, int numVals );
+void RadixSort( vector<string>& L, int numChars );
+void PrintVector( const vector<string>& L ); 
 
 int main( ) 
 {
-    vector<int> L{ 380, 95, 345, 382, 260, 100, 492 };  // to be sorted
+    vector<string> L{ "zebra", "apple", "orange", "can", "candy", "a", "top", "pumpkin", "today", "parade" };  // to be sorted
 
     cout << "Before Sort:\n";
     PrintVector( L ); 

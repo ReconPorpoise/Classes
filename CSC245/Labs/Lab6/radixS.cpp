@@ -5,9 +5,11 @@
 using namespace std;
 
 int maxElemLength( const vector<string>& v );
+void AddPadding( vector<string>& v );
 char GetChar( string word, int k );
 vector<queue<string> > ItemsToQueues( const vector< string >& L, int k );
 vector<string> QueuesToArray( vector<queue<string> >& QA, int numVals );
+void RemovePadding( vector<string>& v );
 void RadixSort( vector<string>& L, int numChars );
 void PrintVector( const vector<string>& L ); 
 
@@ -20,45 +22,57 @@ int main( )
     RadixSort( L, maxElemLength( L ) );
     cout << "\nAfter Sort:\n";
     PrintVector( L );
+
     return 0;
 }
 
-int maxElemLength( const vector<int>& v ) 
+int maxElemLength( const vector<string>& v )
 {
     int max = 0;
-    string curr;
     for( int i = 0; i < v.size(); i++ ) {
-        curr = to_string( v[ i ] );
-        if( curr.length() > max )
-            max = curr.length();
+        if( v[ i ].length() > max )
+            max = v[ i ].length();
     }
 
     return max;
 }
 
-int GetDigit( int number, int k )
-{
-   for( int i = 0; i < k; i++ )
-       number /= 10;
-
-   return( number % 10 );
+void AddPadding( vector<string>& v ) {
+    string spaces = "";
+    for( int i = 0; i < v.size(); i++ ) {
+        if( v[ i ].length() < maxElemLength( v ) ) {
+            int size = v[ i ].length();
+            for( int j = 0; j < maxElemLength( v ) - size; j++ ) {
+                spaces += " ";
+            }
+        }
+        v[ i ] = v[ i ] + spaces;
+        spaces = "";
+    }
 }
 
-vector<queue<int> > ItemsToQueues( const vector< int >& L, int k )
+char GetChar( string word, int k )
 {
-    vector<queue<int> > QA( 10 );
+    k++;
+
+    return( word[ word.length() - k ] );
+}
+
+vector<queue<string> > ItemsToQueues( const vector< string >& L, int k )
+{
+    vector<queue<string> > QA( 128 );
 
     for( int i = 0; i < L.size(); i++ ) {
-        int num = GetDigit( L[ i ], k );
-        QA[ num ].push( L[ i ] );
+        char letter = GetChar( L[ i ], k );
+        QA[ letter ].push( L[ i ] );
     }
 
     return QA;
 }
-
-vector<int> QueuesToArray( vector<queue<int> >& QA, int numVals ) 
+    
+vector<string> QueuesToArray( vector<queue<string> >& QA, int numVals )
 {
-    vector<int> array ( numVals );
+    vector<string> array ( numVals );
     int pos = 0;
     for( int i = 0; i < QA.size(); i++ ) {
         int inner = QA[ i ].size();
@@ -71,16 +85,28 @@ vector<int> QueuesToArray( vector<queue<int> >& QA, int numVals )
     return array;
 }
 
-void RadixSort( vector<int>& L, int numDigits )
+void RemovePadding( vector<string>& v ) 
 {
-    vector<queue<int> > QA( 10 );
-    for( int i = 0; i < numDigits; i++ ) {
+	for( int i = 0; i < v.size(); i++ ) {
+		string curr = v[ i ];
+		while( curr[ curr.length() - 1 ] == ' ' )
+			curr = curr.substr( 0, curr.length() - 1 );
+		v[ i ] = curr;
+	}	
+}
+
+void RadixSort( vector<string>& L, int numChars )
+{
+    vector<queue<string> > QA( 128 );
+    AddPadding( L );
+    for( int i = 0; i < numChars; i++ ) {
         QA = ItemsToQueues( L, i );
         L = QueuesToArray( QA, L.size() );
     }
+	RemovePadding( L );
 }
 
-void PrintVector( const vector<int>& L ) 
+void PrintVector( const vector<string>& L )
 {
     for( int i = 0; i < L.size(); i++ ) {
         cout << L[ i ] << " ";

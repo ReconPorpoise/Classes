@@ -60,21 +60,21 @@ These are called in the client file in the buildGraph method.
 Sample Input/Output
 =============================================================================================================
 With a file containing 3 lines of data...
-    * V1;V2;7
-    * V2;V3;8
-    * V3;V4;10
+* V1;V2;7
+* V2;V3;8
+* V3;V4;10
 ...the program will first check the vertices in the file to see if they are in the 
 vertices vector. If they aren't, it'll add the vertex to the vector as well as the graph. 
 It will then get the weight and vertex pairs, and create edges based on it:
-    * AddEdge(V1, V2, 7);
-    * etc...
+* AddEdge(V1, V2, 7);
+* etc...
 
 Next, it will assign the correct values for the starting vertex, given by the user, 
 in the parallel arrays:
-    * vertices[0] = "V1";
-    * marked[0] = true;
-    * distance[0] = 0;
-    * previous[0] = "N/A";
+* vertices[0] = "V1";
+* marked[0] = true;
+* distance[0] = 0;
+* previous[0] = "N/A";
 
 Lastly, it will repeat that same assignments for each vertex, but the weight, marked, and previous 
 will be decided based upon which next vertex has the least cost. The least-cost gets a true 
@@ -82,11 +82,11 @@ mark, distance is the sum weight from the beginning to that point, and previous 
 
 At the end, it will sort the vectors based on the distance, in ascending order, and print 
 out a table of information for each vertex:
-    * Enter a starting vertex: V1
-    * ------------------------------
-    * Vertex    Distance    Previous
-    * ------    --------    --------
-    *     V1           0         N/A
-    *     V2           7          V1
-    *     V3          15          V2
-    *     V4          25          V3
+* Enter a starting vertex: V1
+* ------------------------------
+* Vertex    Distance    Previous
+* ------    --------    --------
+*     V1           0         N/A
+*     V2           7          V1
+*     V3          15          V2
+*     V4          25          V3

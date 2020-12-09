@@ -52,7 +52,7 @@ int main(int argc, char *argv[])
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// works
+// works!
 void buildGraph(Graph<string>& myGraph, string fileName, vector<string> &vertices)
 {
     ifstream infile;
@@ -86,7 +86,7 @@ void buildGraph(Graph<string>& myGraph, string fileName, vector<string> &vertice
     }
 }
 ////////////////////////////////////////////////////////////////////////////////
-// works
+// works!
 int findIndex(vector<string> vertices, int numVertices, string toFind) 
 {
     int index;
@@ -121,7 +121,11 @@ void createArrs(vector<string> vertices, vector<bool>& marked, vector<int>& dist
 // works!
 void printRow(string origin, int distance, string previ)
 {
-    printf("%30s %30d %30s \n", origin.c_str(), distance, previ.c_str());
+    if(distance == 2000000000)
+        printf("%30s %30s %30s \n", origin.c_str(), "Not on Path", "N/A");
+    else
+        printf("%30s %30d %30s \n", origin.c_str(), distance, previ.c_str());
+    
 }
 ////////////////////////////////////////////////////////////////////////////////
 // works!
@@ -151,6 +155,7 @@ int findMin(vector<bool>& marked, vector<int>& distance)
     return lowIndex;
 }
 ////////////////////////////////////////////////////////////////////////////////
+// works!
 void sortVertices(vector<string> vertices)
 {
     sort(vertices.begin(), vertices.end());
@@ -276,12 +281,16 @@ void doDijkstras(Graph<string> graph, vector<string> vertices)
         marked[startIndex] = true;
         startingPoint = vertices[startIndex];
     }
-    sortAll(vertices, marked, distance, prev);
     cout << "--------------------------------------------------------------------------------------------\n";
     printf("%30s %30s %30s \n", "Vertex", "Distance", "Previous");
     printf("%30s %30s %30s", "------", "--------", "--------");
 
     cout << endl;
+    for(int i = 0; i < numVertices; i++)
+        if(distance[i] > 2000000000 || distance[i] < 0) 
+            distance[i] = 2000000000;
+
+    sortAll(vertices, marked, distance, prev);
     for(int i = 0; i < numVertices; i++)
         printRow(vertices[i], distance[i], prev[i]);
 }

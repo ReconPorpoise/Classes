@@ -13,6 +13,8 @@ int findIndex(vector<string> vertices, int numVertices, string toFind);
 void createArrs(vector<string> vertices, vector<bool>& marked, vector<int>& distance, vector<string>& prev, int numVertices);
 void printRow(string origin, int distance, string previ);
 int findMin(vector<bool>& marked, vector<int>& distance);
+void sortVertices(vector<string> vertices);
+void sortAll(vector<string>& vertices, vector<bool>& marked, vector<int>& dist, vector<string>& prev);
 void doDijkstras(Graph<string> graph, vector<string> vertices);
 
 int main(int argc, char *argv[])
@@ -119,7 +121,7 @@ void createArrs(vector<string> vertices, vector<bool>& marked, vector<int>& dist
 // works!
 void printRow(string origin, int distance, string previ)
 {
-    cout << origin << "\t\t\t" << distance << "\t\t\t" << previ << endl;
+    printf("%30s %30d %30s \n", origin.c_str(), distance, previ.c_str());
 }
 ////////////////////////////////////////////////////////////////////////////////
 // works!
@@ -149,9 +151,58 @@ int findMin(vector<bool>& marked, vector<int>& distance)
     return lowIndex;
 }
 ////////////////////////////////////////////////////////////////////////////////
+void sortVertices(vector<string> vertices)
+{
+    sort(vertices.begin(), vertices.end());
+    int numVertices = vertices.size();
+
+    cout << "--------------- Dijkstra's Algorithm Program ---------------\n\n";
+    cout << "A Weighted Graph has been Build for these " << numVertices << " Cities:\n" << endl;
+    for(int i = 0; i < numVertices; i++) 
+    {
+        if(i % 2 == 0 && i != 0)
+            printf("%30s \n", vertices[i].c_str());
+        else 
+            printf("%30s", vertices[i].c_str());
+    }  
+}
+////////////////////////////////////////////////////////////////////////////////
+// works!
+void sortAll(vector<string>& vertices, vector<bool>& marked, vector<int>& dist, vector<string>& prev)
+{
+    int dSize = dist.size();
+    for(int i = 0; i < dSize; i++)
+    {
+        for(int j = 0; j < dSize - i - 1; j++)
+        {
+            if(dist[j] > dist[j+1])
+            {
+                string verTemp = vertices[j];
+                vertices[j] = vertices[j+1];
+                vertices[j+1] = verTemp;
+
+                bool marTemp = marked[j];
+                marked[j] = marked[j+1];
+                marked[j+1] = marTemp;
+
+                int disTemp = dist[j];
+                dist[j] = dist[j+1];
+                dist[j+1] = disTemp;
+
+                string preTemp = prev[j];
+                prev[j] = prev[j+1];
+                prev[j+1] = preTemp;
+            }
+        }
+    }
+}
+////////////////////////////////////////////////////////////////////////////////
 // works!
 void doDijkstras(Graph<string> graph, vector<string> vertices) 
 {
+    // diplay all cities to the user
+    sortVertices(vertices);
+
     // initialize blank vectors
     vector<bool> marked;
     vector<int> distance;
@@ -167,7 +218,7 @@ void doDijkstras(Graph<string> graph, vector<string> vertices)
     bool found = false;
     while(!found) 
     {
-        cout << "Enter a starting vertex: ";
+        cout << "\nEnter a starting vertex: ";
         getline(cin, startingPoint);
         for(int i = 0; i < numVertices; i++) 
         {
@@ -225,6 +276,12 @@ void doDijkstras(Graph<string> graph, vector<string> vertices)
         marked[startIndex] = true;
         startingPoint = vertices[startIndex];
     }
+    sortAll(vertices, marked, distance, prev);
+    cout << "--------------------------------------------------------------------------------------------\n";
+    printf("%30s %30s %30s \n", "Vertex", "Distance", "Previous");
+    printf("%30s %30s %30s", "------", "--------", "--------");
+
+    cout << endl;
     for(int i = 0; i < numVertices; i++)
         printRow(vertices[i], distance[i], prev[i]);
 }

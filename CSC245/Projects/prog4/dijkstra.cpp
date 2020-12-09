@@ -17,6 +17,8 @@ void sortVertices(vector<string> vertices);
 void sortAll(vector<string>& vertices, vector<bool>& marked, vector<int>& dist, vector<string>& prev);
 void doDijkstras(Graph<string> graph, vector<string> vertices);
 
+////////////////////////////////////////////////////////////////////////////////
+// works!
 int main(int argc, char *argv[])
 {
     // file I/O: check if the filename is given, if it is, check if it's correct
@@ -50,7 +52,6 @@ int main(int argc, char *argv[])
 
     return 0;
 }
-
 ////////////////////////////////////////////////////////////////////////////////
 // works!
 void buildGraph(Graph<string>& myGraph, string fileName, vector<string> &vertices)

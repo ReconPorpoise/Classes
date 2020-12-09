@@ -83,9 +83,9 @@ mark, distance is the sum weight from the beginning to that point, and previous 
 At the end, it will sort the vectors based on the distance, in ascending order, and print 
 out a table of information for each vertex:
 * Enter a starting vertex: V1
-* ------------------------------
+* "------------------------------"
 * Vertex    Distance    Previous
-* ------    --------    --------
+* "------    --------    --------"
 *     V1           0         N/A
 *     V2           7          V1
 *     V3          15          V2

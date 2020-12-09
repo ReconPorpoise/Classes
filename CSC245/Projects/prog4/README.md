@@ -63,8 +63,10 @@ With a file containing 3 lines of data...
 * V1;V2;7
 * V2;V3;8
 * V3;V4;10
+
 ...the program will first check the vertices in the file to see if they are in the 
 vertices vector. If they aren't, it'll add the vertex to the vector as well as the graph. 
+
 It will then get the weight and vertex pairs, and create edges based on it:
 * AddEdge(V1, V2, 7);
 * etc...

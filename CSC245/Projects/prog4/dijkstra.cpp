@@ -11,7 +11,7 @@ using namespace std;
 void buildGraph(Graph<string>& myGraph, string fileName, vector<string> &vertices);
 int findIndex(vector<string> vertices, int numVertices, string toFind);
 void createArrs(vector<string> vertices, vector<bool>& marked, vector<int>& distance, vector<string>& prev, int numVertices);
-void printRow(string destination, int distance, string origin);
+void printRow(string origin, int distance, string previ);
 int findMin(vector<bool>& marked, vector<int>& distance);
 void doDijkstras(Graph<string> graph, vector<string> vertices);
 
@@ -104,6 +104,7 @@ int findIndex(vector<string> vertices, int numVertices, string toFind)
     return -1;
 }
 ////////////////////////////////////////////////////////////////////////////////
+// works!
 void createArrs(vector<string> vertices, vector<bool>& marked, vector<int>& distance, vector<string>& prev, int numVertices) 
 {
     // fill all arrays with generic values EXCEPT for the vertices list
@@ -115,20 +116,40 @@ void createArrs(vector<string> vertices, vector<bool>& marked, vector<int>& dist
     }
 }
 ////////////////////////////////////////////////////////////////////////////////
-void printRow(string destination, int distance, string origin)
+// works!
+void printRow(string origin, int distance, string previ)
 {
-    cout << destination << "\t\t" << distance << "\t\t" << origin << endl;
+    cout << origin << "\t\t\t" << distance << "\t\t\t" << previ << endl;
 }
 ////////////////////////////////////////////////////////////////////////////////
+// works!
 int findMin(vector<bool>& marked, vector<int>& distance)
 {
     int lowIndex;  
-    
-    
+    bool found = false;
+    int i = 0;
+    while(!found && i < distance.size())
+    {
+        if(marked[i] == false) 
+        {
+            lowIndex = i;
+            found = true;
+        } 
+        i++;
+    }
+
+    i = 1;
+    while(i < marked.size())
+    {
+        if(distance[i] < distance[lowIndex] && marked[i] == false)
+            lowIndex = i;
+        i++;
+    }
 
     return lowIndex;
 }
 ////////////////////////////////////////////////////////////////////////////////
+// works!
 void doDijkstras(Graph<string> graph, vector<string> vertices) 
 {
     // initialize blank vectors
@@ -174,24 +195,36 @@ void doDijkstras(Graph<string> graph, vector<string> vertices)
     prev[startIndex] = "N/A";
 
     // find vertices adjacent to starting vertex and add them to a temp vector
-    graph.GetToVertices(startingPoint, graphQueue);
-    vector<string> adjacents;
-    while(!graphQueue.isEmpty())
+    for(int i = 0; i < numVertices - 1; i++) 
     {
-        adjacents.push_back(graphQueue.dequeue());
-    }
-
-    // check each adjacent point
-    for(int i = 0; i < adjacents.size(); i++) 
-    {
-        // if it's not marked...
-        if(!graph.IsMarked(adjacents[i])) 
+        graph.GetToVertices(startingPoint, graphQueue);
+        vector<string> adjacents;
+        while(!graphQueue.isEmpty())
         {
-            // get its weight, then compare it
-            int currIndex = findIndex(vertices, numVertices, adjacents[i]);
-            int weight = graph.WeightIs(startingPoint, adjacents[i]) + distance[startIndex];
-            if( weight < distance[currIndex])
-                distance[currIndex] = weight;
+            adjacents.push_back(graphQueue.dequeue());
         }
-    }  
+
+        // check each adjacent point
+        for(int i = 0; i < adjacents.size(); i++) 
+        {
+            // if it's not marked...
+            if(!graph.IsMarked(adjacents[i])) 
+            {
+                // get its weight, then compare it
+                int currIndex = findIndex(vertices, numVertices, adjacents[i]);
+                int weight = graph.WeightIs(startingPoint, adjacents[i]) + distance[startIndex];
+                if( weight < distance[currIndex]) 
+                {
+                    prev[currIndex] = startingPoint;
+                    distance[currIndex] = weight;
+                }
+            }
+        }  
+        adjacents.empty();
+        startIndex = findMin(marked, distance);
+        marked[startIndex] = true;
+        startingPoint = vertices[startIndex];
+    }
+    for(int i = 0; i < numVertices; i++)
+        printRow(vertices[i], distance[i], prev[i]);
 }

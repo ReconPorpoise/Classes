@@ -1,0 +1,100 @@
+Script started on Wed 18 Nov 2020 08:47:47 AM EST
+]0;karamuca_ra@cobra:~/Classes/CSC245/Labs/Lab6[?1034h[karamuca_ra@cobra Lab6]$ cat -n radix.cpp
+     1	#include <iostream>
+     2	#include <string>
+     3	#include <queue> 
+     4	#include <vector>
+     5	using namespace std;
+     6	
+     7	int maxElemLength( const vector<int>& v );
+     8	int GetDigit( int number, int k );
+     9	vector<queue<int> > ItemsToQueues( const vector< int >& L, int k );
+    10	vector<int> QueuesToArray( vector<queue<int> >& QA, int numVals );
+    11	void RadixSort( vector<int>& L, int numDigits );
+    12	void PrintVector( const vector<int>& L ); 
+    13	
+    14	int main( ) 
+    15	{
+    16	    vector<int> L{ 380, 95, 345, 382, 260, 100, 492 };  // to be sorted
+    17	
+    18	    cout << "Before Sort:\n";
+    19	    PrintVector( L ); 
+    20	    RadixSort( L, maxElemLength( L ) );
+    21	    cout << "\nAfter Sort:\n";
+    22	    PrintVector( L );
+    23	    return 0;
+    24	}
+    25	
+    26	int maxElemLength( const vector<int>& v ) 
+    27	{
+    28	    int max = 0;
+    29	    string curr;
+    30	    for( int i = 0; i < v.size(); i++ ) {
+    31	        curr = to_string( v[ i ] );
+    32	        if( curr.length() > max )
+    33	            max = curr.length();
+    34	    }
+    35	
+    36	    return max;
+    37	}
+    38	
+    39	int GetDigit( int number, int k )
+    40	{
+    41	   for( int i = 0; i < k; i++ )
+    42	       number /= 10;
+    43	
+    44	   return( number % 10 );
+    45	}
+    46	
+    47	vector<queue<int> > ItemsToQueues( const vector< int >& L, int k )
+    48	{
+    49	    vector<queue<int> > QA( 10 );
+    50	
+    51	    for( int i = 0; i < L.size(); i++ ) {
+    52	        int num = GetDigit( L[ i ], k );
+    53	        QA[ num ].push( L[ i ] );
+    54	    }
+    55	
+    56	    return QA;
+    57	}
+    58	
+    59	vector<int> QueuesToArray( vector<queue<int> >& QA, int numVals ) 
+    60	{
+    61	    vector<int> array ( numVals );
+    62	    int pos = 0;
+    63	    for( int i = 0; i < QA.size(); i++ ) {
+    64	        int inner = QA[ i ].size();
+    65	        for( int j = 0; j < inner; j++ ) {
+    66	            array[ pos++ ] = QA[ i ].front();
+    67	            QA[ i ].pop();
+    68	        }
+    69	    }
+    70	
+    71	    return array;
+    72	}
+    73	
+    74	void RadixSort( vector<int>& L, int numDigits )
+    75	{
+    76	    vector<queue<int> > QA( 10 );
+    77	    for( int i = 0; i < numDigits; i++ ) {
+    78	        QA = ItemsToQueues( L, i );
+    79	        L = QueuesToArray( QA, L.size() );
+    80	    }
+    81	}
+    82	
+    83	void PrintVector( const vector<int>& L ) 
+    84	{
+    85	    for( int i = 0; i < L.size(); i++ ) {
+    86	        cout << L[ i ] << " ";
+    87	    }
+    88	    cout << "\n";
+    89	}]0;karamuca_ra@cobra:~/Classes/CSC245/Labs/Lab6[karamuca_ra@cobra Lab6]$ ./a.out 
+Before Sort:
+380 95 345 382 260 100 492 
+
+After Sort:
+95 100 260 345 380 382 492 
+]0;karamuca_ra@cobra:~/Classes/CSC245/Labs/Lab6[karamuca_ra@cobra Lab6]$ exit
+exit
+
+Script done on Wed 18 Nov 2020 08:48:00 AM EST

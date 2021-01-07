@@ -1,0 +1,889 @@
+Script started on Thu 17 Sep 2020 10:52:03 AM EDT
+]0;karamuca_ra@cobra:~/Classes/CSC245/Projects/prog1[?1034h[karamuca_ra@cobra prog1]$ cat MoveFront.cpp
+/* Ronald Karamuca
+ * Project 1: The Move to Front Algorithm
+ * September 15, 2020
+ * Program that handles a doubly linked list 
+ * to do functions such as printing, sorting, and 
+ * accessing data easily
+ */
+#include <iostream>
+#include <string>
+#include <stdlib.h>
+#include "dlist.h"
+using namespace std;
+
+void PrintMenu();
+void HeadInsert( DList<int>& list );
+void TailInsert( DList<int>& list );
+void SortList( DList<int>& list );
+void AccessItem( DList<int>& list );
+void FindandMove( DList<int>& list );
+void Delete( DList<int>& list );
+void PrintList( const DList<int>& list );
+void PrintLength( const DList<int>& list );
+void EmptyList( DList<int>& list );
+
+int main()
+{
+	DList<int> list;
+	string input;
+	char choice;	
+
+	system( "clear" );
+	cout << "Welcome to the Move-to-Front program!\n";
+	// Run-time loop
+	do 
+	{
+		PrintMenu();
+		cin >> input;
+		// take input as a string, if it's not one char, ask again 
+		// until the user sends in a char
+		if( input.length() > 1 ) {
+			while( input.length() > 1 ) {
+				system( "clear" );
+				cout << "Not a char, try again.\n";
+				PrintMenu();
+				cin >> input;
+			}
+		}	
+		choice = input[ 0 ];
+		switch( toupper( choice ) )
+		{
+			case 'H': system( "clear" ); HeadInsert( list ); break;
+			case 'T': system( "clear" ); TailInsert( list ); break;
+			case 'S': system( "clear" ); SortList( list ); break;
+			case 'A': system( "clear" ); AccessItem( list ); break; 
+			case 'D': system( "clear" ); Delete( list ); break;
+			case 'P': system( "clear" ); PrintList( list ); break;
+			case 'L': system( "clear" ); PrintLength( list ); break;
+			case 'E': system( "clear" ); EmptyList( list ); break;
+			case 'Q': system( "clear" ); cout << "Program quitting...\n"; break;
+			default: system( "clear" ); cout << "Incorrect input. Try again.\n";
+		}
+	} while( toupper( choice ) != 'Q' );
+
+	return 0;	
+}
+
+void PrintMenu() 
+{
+	cout << "------------Main Menu------------\n";
+	cout << "|                               |\n";
+	cout << "| H: Insert item at the front   |\n";
+	cout << "| T: Insert item at the end     |\n";
+	cout << "| S: Sort the list              |\n";
+	cout << "| A: Access item in the list    |\n";
+	cout << "| D: Delete an item in the list |\n";
+	cout << "| P: Print the whole list       |\n";
+	cout << "| L: Print the list's length    |\n";
+	cout << "| E: Empty the list             |\n";
+	cout << "| Q: Quit the program           |\n";
+	cout << "|                               |\n";
+	cout << "---------------------------------\n";
+	cout << "Please enter a command: \n";
+}
+
+// Add a non-duplicate value to the front of the list
+void HeadInsert( DList<int>& list ) 
+{
+	// asks for the item to be inserted as the head of the list
+	cout << "Enter the new head: ";
+	int item;
+	cin >> item;
+	// catch if it's a duplicate, then skip. otherwise add.
+	if( list.inList( item ) ) 
+		cout << "Sorry, that value is already in the list.\n";
+	else {
+		list.insertHead(item);
+		cout << "Item added as head of the list.\n";
+	}
+}
+
+// Add a non-duplicate value to the end of the list
+void TailInsert( DList<int>& list )
+{
+	cout << "Enter the new tail: ";
+	int item;
+	cin >> item;
+	
+	// catch if it's a duplicate, then skip. otherwise add.
+	if( list.inList( item ) )
+		cout << "Sorry, that value is already in the list.\n";
+	else {
+		list.appendTail( item );
+		cout << "Item added as tail of the list.\n";
+	}
+}
+
+// Find the item in the list then move it to the front
+void AccessItem( DList<int>& list ) 
+{
+	FindandMove( list );
+}
+
+// Looks for the item in the list: 
+// if found, move it to the front
+void FindandMove( DList<int>& list )
+{
+	// check for an empty list
+	int item;
+	if( list.isEmpty() ) {
+		cout << "List is empty.\n";
+		return;
+	}
+	// delete item from the list to avoid duplicates
+	else {
+		cout << "Enter the item you wish to access: ";
+		cin >> item;
+	}
+	if( list.inList( item ) ) {
+		list.deleteItem( item );
+		list.insertHead( item );
+		cout << "Item found and moved to front.\n";
+	}
+	else {
+		cout << "Item is not in the list.\n";
+	}
+}
+
+// Delete item in the list via deleteItem()
+void Delete( DList<int>& list ) 
+{
+	// check for empty list
+	if( list.isEmpty() ) 
+		cout << "List is empty.\n";
+	else {
+		cout << "Enter item to delete: ";
+		int item;
+		cin >> item;
+		// check if it's in the list to avoid duplicates
+		if( list.inList( item ) ) {
+			list.deleteItem( item );
+			cout << "Item deleted from list.\n";		
+		}
+		else 
+			cout << "Item not in the list.\n";
+	} 
+}
+
+// Check if empty, otherwise print list contents
+void PrintList( const DList<int>& list ) 
+{
+	if( list.isEmpty() ) 
+		cout << "List is empty.\n";
+	else 
+		list.print();
+}
+
+// Check if empty, otherwise print list length
+void PrintLength( const DList<int>& list )
+{
+	if( list.isEmpty() )
+		cout << "List is empty.\n";
+	else
+		cout << "List length: " << list.lengthIs() << endl;
+}
+
+// Sorts list in ascending order
+void SortList( DList<int>& list )
+{
+	if( list.isEmpty() )
+		cout << "List is empty.\n";
+	else {
+		list.sortList();
+		cout << "List sorted.\n";
+	}
+}
+
+// Deletes all items in the list and frees memory
+void EmptyList( DList<int>& list )
+{
+	if( list.isEmpty() )
+		cout << "List is already empty.\n";
+	else {
+		list.makeEmpty();
+		cout << "List has been emptied.\n";	
+	}
+}
+]0;karamuca_ra@cobra:~/Classes/CSC245/Projects/prog1[karamuca_ra@cobra prog1]$ cat dlish[Kt.h
+
+using namespace std;
+
+template <class ItemType>
+struct NodeType;
+
+template <class ItemType>
+class DList 
+{
+public :
+    DList ();		// Constructor
+    ~DList   ();  	// Destructor	
+
+    // Public Operations
+    void makeEmpty (); 
+    void deleteItem (ItemType item);
+    bool inList (ItemType item) const;	
+    bool isEmpty () const;  
+    void print() const; 
+    void insertHead (ItemType item); 
+    void appendTail (ItemType item); 
+    int lengthIs() const;
+    void sortList();
+
+private :
+    // Private Attributes of a DList Object 
+    NodeType<ItemType>* head;
+    int length;
+
+    // Functions Called Solely By Public Functions, Not The Client 
+    NodeType<ItemType>* location(ItemType item) const;
+    NodeType<ItemType>* last() const; 
+    void deleteLocation (NodeType<ItemType>* delPtr);
+};
+
+#include "dlist.cpp"
+]0;karamuca_ra@cobra:~/Classes/CSC245/Projects/prog1[karamuca_ra@cobra prog1]$ cat dlist.cpp
+#include <cstddef> 
+#include <iostream>
+#include <vector>
+#include <algorithm>
+
+using namespace std;
+
+template<class ItemType>
+struct NodeType
+{
+	ItemType info;
+	NodeType<ItemType>*	next;
+	NodeType<ItemType>*	back;
+};
+
+template <class ItemType>		
+DList<ItemType>::DList()		// Class constructor
+{
+    length = 0;
+    head = NULL;
+}
+
+template <class ItemType>
+DList<ItemType>::~DList   ()		
+{
+	// Post: List is empty; All items have been deallocated.
+	makeEmpty();
+}
+
+template <class ItemType>
+void DList<ItemType>::makeEmpty()
+{
+    	// Post: List is empty; all items have been deallocated.
+	
+	// until the list is empty, delete the tail over and over.
+	while( !isEmpty() ) {
+		deleteLocation( last() );
+	}
+}
+
+template <class ItemType>
+void DList<ItemType>::deleteItem (ItemType item)	
+{
+	//  Pre :  item to be deleted is passed in via parameter 
+        // Post :  item is deleted if it exists in list 
+        
+	// delete the node at the item's location
+	deleteLocation( location( item ) );
+}
+
+template <class ItemType>
+bool DList<ItemType>::inList (ItemType item) const
+{
+	//  Pre :  item to be located is passed in via parameter 
+        // Post :  function returns bool value if item is found 
+	
+	// create a temp that is equal to head so we don't change head
+	NodeType<ItemType>* temp = new NodeType<ItemType>;
+	temp = head;
+	
+	// parse the whole list until we find the value
+	// if we don't, jump to the next one 
+	bool found = false;
+	while( temp != NULL ) {
+		if( temp -> info == item ) {
+			found = true;
+			return found;
+		}
+		else 
+			temp = temp -> next;
+	}
+	return found;
+}
+
+template <class ItemType>
+bool DList<ItemType>::isEmpty() const		
+{
+	// Post : function returns true if list is empty, false otherwise
+	
+	// returns true if there is no value in head
+	// otherwise, the list is not empty
+	return head == NULL;	
+}
+
+
+// WORKS
+template <class ItemType>
+void DList<ItemType>::print() const	
+{
+	// Pre  : List is not empty 
+	// Post : Items in List have been printed to screen
+
+	// temp used to not change head value or pointers
+	NodeType<ItemType>* temp = new NodeType<ItemType>;
+	temp = head;
+	int counter = 1;
+	// check if it's empty before parsing
+	if( temp == NULL ) {
+		cout << "List is empty.\n";
+	}	
+	else {
+		// print the info at each node before jumping to the next
+		while( temp !=  NULL ) {
+			cout << counter << ":\t" << temp -> info << "\n";
+			temp = temp -> next;
+			counter++;
+		}
+		cout << "End of the list.\n";
+	}
+}
+
+// WORKS
+template <class ItemType>
+void DList<ItemType>::insertHead(ItemType item)	
+{
+	//  Pre : item to be inserted is passed in via parameter
+        // Post : item is inserted at head of list;  Former first node is 
+        //        linked back to this new one via double link;
+        //        Length incremented;  Special case handled if list is empty 
+
+	// if the list is empty, just create a node as head,
+	// where the back is NULL and the info is the item passed
+	NodeType<ItemType>* newNode = new NodeType<ItemType>;
+	newNode -> info = item;
+	newNode -> back = NULL;
+	
+	// if there are items in the list, set the head to the second item and
+	// have the new item become the head node
+	if( head != NULL ) {
+		head -> back = newNode;
+		newNode -> next = head;
+	}
+	// if there is just an empty head node, replace it with newNode 
+	else {
+		newNode -> next = NULL;
+	}			
+
+	head = newNode;
+	length++;
+}
+
+template <class ItemType>
+void DList<ItemType>::appendTail(ItemType item)
+{
+	//  Pre :  item to be inserted is passed in via parameter
+        // Post :  item is added to tail of list; Former last node
+        //         is linked to this new one via double link 
+	NodeType<ItemType>* newNode = new NodeType<ItemType>;
+	NodeType<ItemType>* tail = new NodeType<ItemType>;
+	
+	newNode -> info = item;
+	newNode -> next = NULL;
+	
+	// look for tail, then set newNode as its next, and newNode's back as tail
+	tail = head;
+	if( tail == NULL ) {
+		newNode -> back = NULL;
+		head = newNode;
+		length++;
+	}
+	// if there are list items, keep pushing to the end THEN insert the 
+	// node with the correct pointers to the previous node
+	else {
+		while( tail -> next != NULL ) {
+			tail = tail -> next;
+		}
+		tail -> next = newNode;
+		newNode -> back = tail;
+		
+		length++;
+	}
+}
+
+// WORKS
+template <class ItemType>
+int DList<ItemType>::lengthIs() const	
+{
+	// Post : Function returns current length of list  
+	
+	// returns the private variable "length" that we increment/
+	// decrement in insertHead, appendTail, and delete functions
+	return length;
+}
+
+// WORKS
+template <class ItemType>
+NodeType<ItemType>* DList<ItemType>::location(ItemType item) const	
+{
+	//  Pre : item to be located is passed in via parameter 
+        // Post : function returns address of item being searched for --
+        //        if not found, NULL is returned  
+
+	// temp variable to not mess up head
+	NodeType<ItemType>* temp = head;
+
+	// search the list for a node with info matching item,
+	// then return that node. Else return NULL
+	while( temp != NULL ) {
+		if( temp -> info == item ) {
+			return temp;
+		}
+		temp = temp -> next;
+	}	
+	return NULL;		
+}
+
+// WORKS
+template <class ItemType>
+NodeType<ItemType>* DList<ItemType>::last() const	
+{
+	// Post : Function returns location of current last item in list
+	NodeType<ItemType>* temp = head;
+	// keep jumping node to node until node -> next is NULL (end)
+	while( temp -> next != NULL ) {
+		temp = temp -> next;
+	}	
+	return temp;		
+}
+
+// WORKS
+template <class ItemType>
+void DList<ItemType>::deleteLocation (NodeType<ItemType>* delPtr)	
+{
+
+	//  Pre : Item to be deleted exits in list and its location
+        //        is passed in via parameter
+                   
+	// Post : Location passed in is removed from list;  Length
+        //        is decremented, and location is deallocated 
+
+        // Special Cases Handled for Deleting Only One Item in List,
+        // The Head Item of List, and the Tail Item of List
+        
+	// if its a size 1 list
+	if( length == 1 ) {
+		delete delPtr;
+		delPtr = NULL;
+		head = NULL;
+		length--;
+	}
+	// if its the head
+	else if( delPtr == head ) {
+		head = delPtr -> next;
+		head -> back = NULL;
+		delete delPtr;
+		delPtr = NULL;
+		length--;
+	}
+	// if its the tail
+	else if( delPtr == last() ) {
+		// new tail is the prev node so point that to NULL, then point that back to the node behind it
+		delPtr -> back -> next = NULL;
+		delete delPtr;
+		delPtr = NULL;
+		length--;
+	}
+	// all others
+	else {
+		// node gets removed. it's old next now becomes it's previous node's next, and the it's old back now becomes the next node's back
+		delPtr -> back -> next = delPtr -> next;
+		delPtr -> next -> back = delPtr -> back;
+		delete delPtr;
+		delPtr = NULL;
+		length--;
+	}
+}
+
+template <class ItemType>
+void DList<ItemType>::sortList()
+{
+	// Pre : List to be sorted calls .sort()
+	
+	// Post : Updates list to be sorted in ascending order
+	
+	vector<ItemType> content;	
+	NodeType<ItemType>* temp = head;
+	
+	if( temp != NULL ) {
+		while( temp != NULL ) {
+			// push all dll info to a vector
+			content.push_back( temp -> info );
+			temp = temp -> next;
+		}
+
+		// sort vector then fill then replace all dll info with the correctly sorted info
+		sort( content.begin(), content.end() );
+		temp = head;
+		
+		while( temp != NULL ) {
+			temp -> info = content[ 0 ];
+			content.erase( content.begin() );
+			temp = temp -> next;
+		}
+	}
+}
+]0;karamuca_ra@cobra:~/Classes/CSC245/Projects/prog1[karamuca_ra@cobra prog1]$ c++ MoveFront.cpp
+]0;karamuca_ra@cobra:~/Classes/CSC245/Projects/prog1[karamuca_ra@cobra prog1]$ a.out 
+[3;J[H[2JWelcome to the Move-to-Front program!
+------------Main Menu------------
+|                               |
+| H: Insert item at the front   |
+| T: Insert item at the end     |
+| S: Sort the list              |
+| A: Access item in the list    |
+| D: Delete an item in the list |
+| P: Print the whole list       |
+| L: Print the list's length    |
+| E: Empty the list             |
+| Q: Quit the program           |
+|                               |
+---------------------------------
+Please enter a command: 
+h
+[3;J[H[2JEnter the new head: 123
+Item added as head of the list.
+------------Main Menu------------
+|                               |
+| H: Insert item at the front   |
+| T: Insert item at the end     |
+| S: Sort the list              |
+| A: Access item in the list    |
+| D: Delete an item in the list |
+| P: Print the whole list       |
+| L: Print the list's length    |
+| E: Empty the list             |
+| Q: Quit the program           |
+|                               |
+---------------------------------
+Please enter a command: 
+h
+[3;J[H[2JEnter the new head: 12
+Item added as head of the list.
+------------Main Menu------------
+|                               |
+| H: Insert item at the front   |
+| T: Insert item at the end     |
+| S: Sort the list              |
+| A: Access item in the list    |
+| D: Delete an item in the list |
+| P: Print the whole list       |
+| L: Print the list's length    |
+| E: Empty the list             |
+| Q: Quit the program           |
+|                               |
+---------------------------------
+Please enter a command: 
+p
+[3;J[H[2J1:	12
+2:	123
+End of the list.
+------------Main Menu------------
+|                               |
+| H: Insert item at the front   |
+| T: Insert item at the end     |
+| S: Sort the list              |
+| A: Access item in the list    |
+| D: Delete an item in the list |
+| P: Print the whole list       |
+| L: Print the list's length    |
+| E: Empty the list             |
+| Q: Quit the program           |
+|                               |
+---------------------------------
+Please enter a command: 
+t
+[3;J[H[2JEnter the new tail: 123  0
+Item added as tail of the list.
+------------Main Menu------------
+|                               |
+| H: Insert item at the front   |
+| T: Insert item at the end     |
+| S: Sort the list              |
+| A: Access item in the list    |
+| D: Delete an item in the list |
+| P: Print the whole list       |
+| L: Print the list's length    |
+| E: Empty the list             |
+| Q: Quit the program           |
+|                               |
+---------------------------------
+Please enter a command: 
+p
+[3;J[H[2J1:	12
+2:	123
+3:	10
+End of the list.
+------------Main Menu------------
+|                               |
+| H: Insert item at the front   |
+| T: Insert item at the end     |
+| S: Sort the list              |
+| A: Access item in the list    |
+| D: Delete an item in the list |
+| P: Print the whole list       |
+| L: Print the list's length    |
+| E: Empty the list             |
+| Q: Quit the program           |
+|                               |
+---------------------------------
+Please enter a command: 
+l
+[3;J[H[2JList length: 3
+------------Main Menu------------
+|                               |
+| H: Insert item at the front   |
+| T: Insert item at the end     |
+| S: Sort the list              |
+| A: Access item in the list    |
+| D: Delete an item in the list |
+| P: Print the whole list       |
+| L: Print the list's length    |
+| E: Empty the list             |
+| Q: Quit the program           |
+|                               |
+---------------------------------
+Please enter a command: 
+p
+[3;J[H[2J1:	12
+2:	123
+3:	10
+End of the list.
+------------Main Menu------------
+|                               |
+| H: Insert item at the front   |
+| T: Insert item at the end     |
+| S: Sort the list              |
+| A: Access item in the list    |
+| D: Delete an item in the list |
+| P: Print the whole list       |
+| L: Print the list's length    |
+| E: Empty the list             |
+| Q: Quit the program           |
+|                               |
+---------------------------------
+Please enter a command: 
+a
+[3;J[H[2JEnter the item you wish to access: 123
+Item found and moved to front.
+------------Main Menu------------
+|                               |
+| H: Insert item at the front   |
+| T: Insert item at the end     |
+| S: Sort the list              |
+| A: Access item in the list    |
+| D: Delete an item in the list |
+| P: Print the whole list       |
+| L: Print the list's length    |
+| E: Empty the list             |
+| Q: Quit the program           |
+|                               |
+---------------------------------
+Please enter a command: 
+p
+[3;J[H[2J1:	123
+2:	12
+3:	10
+End of the list.
+------------Main Menu------------
+|                               |
+| H: Insert item at the front   |
+| T: Insert item at the end     |
+| S: Sort the list              |
+| A: Access item in the list    |
+| D: Delete an item in the list |
+| P: Print the whole list       |
+| L: Print the list's length    |
+| E: Empty the list             |
+| Q: Quit the program           |
+|                               |
+---------------------------------
+Please enter a command: 
+s
+[3;J[H[2JList sorted.
+------------Main Menu------------
+|                               |
+| H: Insert item at the front   |
+| T: Insert item at the end     |
+| S: Sort the list              |
+| A: Access item in the list    |
+| D: Delete an item in the list |
+| P: Print the whole list       |
+| L: Print the list's length    |
+| E: Empty the list             |
+| Q: Quit the program           |
+|                               |
+---------------------------------
+Please enter a command: 
+p
+[3;J[H[2J1:	10
+2:	12
+3:	123
+End of the list.
+------------Main Menu------------
+|                               |
+| H: Insert item at the front   |
+| T: Insert item at the end     |
+| S: Sort the list              |
+| A: Access item in the list    |
+| D: Delete an item in the list |
+| P: Print the whole list       |
+| L: Print the list's length    |
+| E: Empty the list             |
+| Q: Quit the program           |
+|                               |
+---------------------------------
+Please enter a command: 
+d
+[3;J[H[2JEnter item to delete: 12
+Item deleted from list.
+------------Main Menu------------
+|                               |
+| H: Insert item at the front   |
+| T: Insert item at the end     |
+| S: Sort the list              |
+| A: Access item in the list    |
+| D: Delete an item in the list |
+| P: Print the whole list       |
+| L: Print the list's length    |
+| E: Empty the list             |
+| Q: Quit the program           |
+|                               |
+---------------------------------
+Please enter a command: 
+p
+[3;J[H[2J1:	10
+2:	123
+End of the list.
+------------Main Menu------------
+|                               |
+| H: Insert item at the front   |
+| T: Insert item at the end     |
+| S: Sort the list              |
+| A: Access item in the list    |
+| D: Delete an item in the list |
+| P: Print the whole list       |
+| L: Print the list's length    |
+| E: Empty the list             |
+| Q: Quit the program           |
+|                               |
+---------------------------------
+Please enter a command: 
+e
+[3;J[H[2JList has been emptied.
+------------Main Menu------------
+|                               |
+| H: Insert item at the front   |
+| T: Insert item at the end     |
+| S: Sort the list              |
+| A: Access item in the list    |
+| D: Delete an item in the list |
+| P: Print the whole list       |
+| L: Print the list's length    |
+| E: Empty the list             |
+| Q: Quit the program           |
+|                               |
+---------------------------------
+Please enter a command: 
+p
+[3;J[H[2JList is empty.
+------------Main Menu------------
+|                               |
+| H: Insert item at the front   |
+| T: Insert item at the end     |
+| S: Sort the list              |
+| A: Access item in the list    |
+| D: Delete an item in the list |
+| P: Print the whole list       |
+| L: Print the list's length    |
+| E: Empty the list             |
+| Q: Quit the program           |
+|                               |
+---------------------------------
+Please enter a command: 
+l
+[3;J[H[2JList is empty.
+------------Main Menu------------
+|                               |
+| H: Insert item at the front   |
+| T: Insert item at the end     |
+| S: Sort the list              |
+| A: Access item in the list    |
+| D: Delete an item in the list |
+| P: Print the whole list       |
+| L: Print the list's length    |
+| E: Empty the list             |
+| Q: Quit the program           |
+|                               |
+---------------------------------
+Please enter a command: 
+d
+[3;J[H[2JList is empty.
+------------Main Menu------------
+|                               |
+| H: Insert item at the front   |
+| T: Insert item at the end     |
+| S: Sort the list              |
+| A: Access item in the list    |
+| D: Delete an item in the list |
+| P: Print the whole list       |
+| L: Print the list's length    |
+| E: Empty the list             |
+| Q: Quit the program           |
+|                               |
+---------------------------------
+Please enter a command: 
+s
+[3;J[H[2JList is empty.
+------------Main Menu------------
+|                               |
+| H: Insert item at the front   |
+| T: Insert item at the end     |
+| S: Sort the list              |
+| A: Access item in the list    |
+| D: Delete an item in the list |
+| P: Print the whole list       |
+| L: Print the list's length    |
+| E: Empty the list             |
+| Q: Quit the program           |
+|                               |
+---------------------------------
+Please enter a command: 
+a
+[3;J[H[2JList is empty.
+------------Main Menu------------
+|                               |
+| H: Insert item at the front   |
+| T: Insert item at the end     |
+| S: Sort the list              |
+| A: Access item in the list    |
+| D: Delete an item in the list |
+| P: Print the whole list       |
+| L: Print the list's length    |
+| E: Empty the list             |
+| Q: Quit the program           |
+|                               |
+---------------------------------
+Please enter a command: 
+q
+[3;J[H[2JProgram quitting...
+]0;karamuca_ra@cobra:~/Classes/CSC245/Projects/prog1[karamuca_ra@cobra prog1]$ exit
+exit
+
+Script done on Thu 17 Sep 2020 10:53:06 AM EDT

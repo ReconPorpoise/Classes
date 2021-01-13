@@ -63,31 +63,30 @@ void iterate(string file, bool lines, bool words, bool bytes)
 	int wordCount = 0;
 	int byteCount = 0;
 	char curr;
-    char prev = '\n';
+	char prev = '\n';
 
 	// start at the beginning of the file...
 	infile.seekg(0, ios::beg);
 	// while there are still characters in the file...
 	// grab the current character in the stream:
 	while(infile.get(curr)) {
-		// if the current character is a newline but the last one isn't,
-		// increment the word count and the line count because, since there
-		// won't be a space after the last word in a line, it would get ignored
-		if(curr == '\n' && prev != '\n') {
- 			wordCount++;
+		// if current char is newline, but previous isn't a space character, increment word and line count
+		if(curr == '\n' && prev != '\n' && prev != '\t' && prev != ' ') {
+			wordCount++;
 			lineCount++;
 		}
-		// if it's a blank line (last char was a newline as well as the current char),
-		// only increment the line count as to not double-count words
+		// if the curr and prev chars are newline (blank line), increment line count
 		else if(curr == '\n' && prev == '\n') 
 			lineCount++;
-		// if it's a space, add one to word count
-		else if(curr == ' ') 
+		// if the curr char is a tab, make sure the prev wasn't another space char then increment word counter
+		else if(curr == '\t' && prev != ' ' && prev != '\t' && prev != '\n') 
+			wordCount++;
+		// if the curr char is a space, make sure the prev wasn't another space char then increment word count
+		else if(curr == ' ' && prev != ' ' && prev != '\t' && prev != '\n') 
 			wordCount++;
 
-		// increment byte count no matter what, as each character is a byte
+		// always increment bytes, as each char is a byte, then update prev char
 		byteCount++;
-		// set previous to be the curr for next comparison in loop
 		prev = curr;
 	}
 	// close the file stream

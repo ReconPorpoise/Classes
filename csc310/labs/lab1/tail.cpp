@@ -1,6 +1,15 @@
+/*
+ * Ronald Karamuca
+ * 1-13-2021
+ * CSC 310 Lab 1: Back in the Saddle Again
+ * Part 1: Unix tail clone
+ * Uses fstream methods to iterate through a file backwards, then print
+ * from the given position.
+ */
 #include <iostream>
 #include <fstream>
 using namespace std;
+
 void printLines(string file, int nLines);
 
 int main(int argc, char *argv[])
@@ -13,10 +22,12 @@ int main(int argc, char *argv[])
 	numLinesS = numLinesS.substr(1, numLinesS.length());
 	int numLines = stoi(numLinesS);
 
+	// call function to tail
 	printLines(filename, numLines);	
 	return 0;
 }
 
+// function with tail logic
 void printLines(string file, int nLines)
 {
 	// create the file stream with input mode
@@ -27,22 +38,34 @@ void printLines(string file, int nLines)
 
 	// start at the end of the file...
 	infile.seekg(0, ios::end);
+	// keep track of what byte we are at, in case we need to tail all lines
+	long size = infile.tellg();
+	long currSize = 0;
 	// while we have yet to find 'n' number of newline chars...
 	while(eolCount <= nLines) {
+		currSize++;
 		// go back one position
 		infile.seekg(-1, ios::cur);
 		// get the character at that position
 		curr = infile.peek();
 		// if it's a newline, increment the counter
 		if(curr == '\n')
-			eolCount++;	
+			eolCount++;
+		// if we have reached the beginning of the file, set cursor to beginning and break
+		if(size == currSize) {
+			infile.seekg(0, ios::beg);	
+			break;
+		}
 	}
-	// start getting chars from the position + 1 (remove '\n' from output) of seekg until EoF
-	infile.seekg(1, ios::cur);
+	curr = infile.peek();
+	// if the first char in the stream is a newline, move one forward
+	// else, just start printing from seekg(0, ios::beg)
+	// (user wanted to tail all lines)
+	if(curr == '\n')
+		infile.seekg(1, ios::cur);
 	while(infile.get(curr)) {
 		cout << curr;
 	}
-	infile.clear();
+	// close file stream
 	infile.close();
-	
 }

@@ -17,6 +17,14 @@ int main(int argc, char *argv[])
 	// get the two arguments (number of lines they want and file name) from user
 	string numLinesS = argv[1];
 	string filename = argv[2];
+	
+	// check if provided file is valid
+	fstream test(filename);
+	if(!test) {
+		cout << "Provide a valid file: '" << filename << "' does not exist." << endl;
+		return -1;
+	}
+	test.close();
 
 	// remove the '-' from the line number argument
 	numLinesS = numLinesS.substr(1, numLinesS.length());

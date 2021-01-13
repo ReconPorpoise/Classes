@@ -19,8 +19,14 @@ int main(int argc, char *argv[])
 	// initialize the filename and arguments string for checks
 	string filename;
 	string arguments;
+	// check if user only ran exe w/o filename 
+	if(argc == 1) {
+		cout << "Enter the command with the format: myWc [options -wlc] filename" << endl;
+		return -1;
+	}
+
 	// check if the user included arguments (argc would be 3, whereas
-	// it would be 2 if they only entered a file name).
+	// it would be 2 if they only entered a file name)
 	if(argc == 3 ) {	
 		arguments = argv[1];
 		filename = argv[2];
@@ -35,24 +41,36 @@ int main(int argc, char *argv[])
 				words = true;
 			else if(arguments[i] == 'c')
 				bytes = true;
+			else {
+				cout << "Incorrect option:" << endl;
+				cout << "Your options are -w, -l, or -c, in the format of 'myWc -wcl filename'" << endl;
+				cout << "You can enter any of the 3 options in one argument, or provide no options to get all information." << endl;
+				return -1;
+			} 	
 		}
 	}
-	// if the user did not provide arguments, true all counters and grab filename
-	// (this acts like wc, where all info is provided if users do not include options)
+	// if no options provided, set all options to true and print all info
 	else {
 		filename = argv[1];
 		lines = true;
 		words = true;
 		bytes = true;
 	}	
+	
+	// test if file is valid
+	fstream test(filename);
+	if(!test) {
+		cout << "Provide a valid file: '" << filename << "' does not exist." << endl;
+		return -1;
+	}
+	test.close();
+
 	// call function for iteration of the file  
 	iterate(filename, lines, words, bytes);
 	return 0;
 }
 
-// main logic of the program: gets the line count, word count, and
-// byte count regardless of if the user asked for it. 
-// Only prints what the user wanted.
+// main logic of the program: gets line, word, and byte counts
 void iterate(string file, bool lines, bool words, bool bytes)
 {
 	// create the file stream with input mode

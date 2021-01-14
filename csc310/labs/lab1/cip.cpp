@@ -48,20 +48,27 @@ class ExtraTwo : public Base {
 
 int main() 
 {
+	// create object of class Base and call its iam()
 	Base base;
 	base.iam();
 
+	// create object of class ExtraOne and call its iam() and iam2()
+	// iam2() should be the same as Base and iam() should be overloaded
 	ExtraOne eone;
 	eone.iam();
 	eone.iam2();
 
+	// create object of class ExtraTwo and call its iam() and iam2()
+	// iam2() should be the same as Base and iam() should be overloaded
 	ExtraTwo etwo;
 	etwo.iam();
 	etwo.iam2();
 
+	// create pointers to the derived-class objects and call their methods using them
 	Base *eoneP = &eone;
 	Base *etwoP = &etwo;
 	eoneP -> iam();
 	etwoP -> iam();
+
 	return 0;
 }

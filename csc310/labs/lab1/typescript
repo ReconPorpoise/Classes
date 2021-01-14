@@ -1,0 +1,284 @@
+Script started on Thu 14 Jan 2021 12:36:48 AM EST
+]0;karamuca_ra@cobra:~/classes/csc310/labs/lab1[?1034h[karamuca_ra@cobra lab1]$ cat tail.cpp 
+/*
+ * Ronald Karamuca
+ * 1-13-2021
+ * CSC 310 Lab 1: Back in the Saddle Again
+ * Part 1: Unix tail clone
+ * Uses fstream methods to iterate through a file backwards, then print
+ * from the given position.
+ */
+#include <iostream>
+#include <fstream>
+using namespace std;
+
+void printLines(string file, int nLines);
+
+int main(int argc, char *argv[])
+{
+	// get the two arguments (number of lines they want and file name) from user
+	string numLinesS = argv[1];
+	string filename = argv[2];
+	
+	// check if provided file is valid
+	fstream test(filename);
+	if(!test) {
+		cout << "Provide a valid file: '" << filename << "' does not exist." << endl;
+		return -1;
+	}
+	test.close();
+
+	// remove the '-' from the line number argument
+	numLinesS = numLinesS.substr(1, numLinesS.length());
+	int numLines = stoi(numLinesS);
+
+	// call function to tail
+	printLines(filename, numLines);	
+	return 0;
+}
+
+// function with tail logic
+void printLines(string file, int nLines)
+{
+	// create the file stream with input mode
+	fstream infile(file.c_str(), ios::in);
+	// counter for '\n' and temp charater for iteration
+	int eolCount = 0;
+	char curr;
+
+	// start at the end of the file...
+	infile.seekg(0, ios::end);
+	// keep track of what byte we are at, in case we need to tail all lines
+	long size = infile.tellg();
+	long currSize = 0;
+	// while we have yet to find 'n' number of newline chars...
+	while(eolCount <= nLines) {
+		currSize++;
+		// go back one position
+		infile.seekg(-1, ios::cur);
+		// get the character at that position
+		curr = infile.peek();
+		// if it's a newline, increment the counter
+		if(curr == '\n')
+			eolCount++;
+		// if we have reached the beginning of the file, set cursor to beginning and break
+		if(size == currSize) {
+			infile.seekg(0, ios::beg);	
+			break;
+		}
+	}
+	curr = infile.peek();
+	// if the first char in the stream is a newline, move one forward
+	// else, just start printing from seekg(0, ios::beg)
+	// (user wanted to tail all lines)
+	if(curr == '\n')
+		infile.seekg(1, ios::cur);
+	while(infile.get(curr)) {
+		cout << curr;
+	}
+	// close file stream
+	infile.close();
+}
+]0;karamuca_ra@cobra:~/classes/csc310/labs/lab1[karamuca_ra@cobra lab1]$ cat wc.cpp
+/*
+ * Ronald Karamuca
+ * 1-13-2021
+ * CSC 310 Lab 1: Back in the Saddle Again
+ * Part 2: Unix wc clone
+ * Uses fstream methods to iterate through a file, get the number of lines,
+ * words, and bytes in the file, then outputs that information to the user.
+ */
+#include <iostream>
+#include <fstream>
+using namespace std;
+
+void iterate(string file, bool lines, bool words, bool bytes);
+
+int main(int argc, char *argv[])
+{
+	// initialize the bool checks for user arguments
+	bool lines, words, bytes;
+	// initialize the filename and arguments string for checks
+	string filename;
+	string arguments;
+	// check if user only ran exe w/o filename 
+	if(argc == 1) {
+		cout << "Enter the command with the format: myWc [options -wlc] filename" << endl;
+		return -1;
+	}
+
+	// check if the user included arguments (argc would be 3, whereas
+	// it would be 2 if they only entered a file name)
+	if(argc == 3 ) {	
+		arguments = argv[1];
+		filename = argv[2];
+
+		// remove the '-' from the arguments
+		arguments = arguments.substr(1, arguments.length());
+		// checks for if the user wants line count, word count, and/or byte count
+		for(int i = 0; i < arguments.length(); i++) {
+			if(arguments[i] == 'l')
+				lines = true;
+			else if(arguments[i] == 'w')
+				words = true;
+			else if(arguments[i] == 'c')
+				bytes = true;
+			else {
+				cout << "Incorrect option:" << endl;
+				cout << "Your options are -w, -l, or -c, in the format of 'myWc -wcl filename'" << endl;
+				cout << "You can enter any of the 3 options in one argument, or provide no options to get all information." << endl;
+				return -1;
+			} 	
+		}
+	}
+	// if no options provided, set all options to true and print all info
+	else {
+		filename = argv[1];
+		lines = true;
+		words = true;
+		bytes = true;
+	}	
+	
+	// test if file is valid
+	fstream test(filename);
+	if(!test) {
+		cout << "Provide a valid file: '" << filename << "' does not exist." << endl;
+		return -1;
+	}
+	test.close();
+
+	// call function for iteration of the file  
+	iterate(filename, lines, words, bytes);
+	return 0;
+}
+
+// main logic of the program: gets line, word, and byte counts
+void iterate(string file, bool lines, bool words, bool bytes)
+{
+	// create the file stream with input mode
+	fstream infile(file.c_str(), ios::in);
+	// counters for line count, word count, byte count, 
+	// and temp chars for current file position and prev character
+	int lineCount = 0;
+	int wordCount = 0;
+	int byteCount = 0;
+	char curr;
+	char prev = '\n';
+
+	// start at the beginning of the file...
+	infile.seekg(0, ios::beg);
+	// while there are still characters in the file...
+	// grab the current character in the stream:
+	while(infile.get(curr)) {
+		// if current char is newline, but previous isn't a space character, increment word and line count
+		if(curr == '\n' && prev != '\n' && prev != '\t' && prev != ' ') {
+			wordCount++;
+			lineCount++;
+		}
+		// if the curr and prev chars are newline (blank line), increment line count
+		else if(curr == '\n' && prev == '\n') 
+			lineCount++;
+		// if the curr char is a tab, make sure the prev wasn't another space char then increment word counter
+		else if(curr == '\t' && prev != ' ' && prev != '\t' && prev != '\n') 
+			wordCount++;
+		// if the curr char is a space, make sure the prev wasn't another space char then increment word count
+		else if(curr == ' ' && prev != ' ' && prev != '\t' && prev != '\n') 
+			wordCount++;
+
+		// always increment bytes, as each char is a byte, then update prev char
+		byteCount++;
+		prev = curr;
+	}
+	// close the file stream
+	infile.close();
+	
+	// only output what the user asked for, with the file name at the end
+	string output = "";
+	if(lines) {
+		output += "\t";
+		output += to_string(lineCount);
+	}
+	if(words) {
+		output += "\t";
+		output += to_string(wordCount);
+	}	
+	if(bytes) {
+		output += "\t";
+		output += to_string(byteCount);
+	}
+	output += " ";
+	output += file;
+	cout << output << endl;
+} 
+]0;karamuca_ra@cobra:~/classes/csc310/labs/lab1[karamuca_ra@cobra lab1]$ cat cip.cpp 
+/*
+ * Ronald Karamuca
+ * 1-13-2021
+ * CSC 310 Lab 1: Back in the Saddle Again
+ * Part 3: Classes, Inheritance, and Polymorphism
+ * Uses virtual to enable inheritance and polymorphism
+ * then creates objects of those classes for demonstration.
+ */
+#include <iostream>
+using namespace std;
+
+class Base
+{
+	public:
+		virtual void iam();
+};
+
+void Base::iam()
+{
+	cout << "base" << endl;
+}
+
+// class derived from Base
+class ExtraOne : public Base {
+	public:
+		// overloaded iam()
+		void iam() {
+			cout << "iam one" << endl;
+		}
+		// iam2() calls base iam()
+		void iam2() {
+			Base::iam();
+		}
+};
+
+// class derived from Base
+class ExtraTwo : public Base {
+	public:
+		// overloaded iam()
+		void iam() {
+			cout << "iam two" << endl;
+		}
+		// iam2() calls base iam()
+		void iam2() {
+			Base::iam();
+		}
+};
+
+int main() 
+{
+	Base base;
+	base.iam();
+
+	ExtraOne eone;
+	eone.iam();
+	eone.iam2();
+
+	ExtraTwo etwo;
+	etwo.iam();
+	etwo.iam2();
+
+	Base *eoneP = &eone;
+	Base *etwoP = &etwo;
+	eoneP -> iam();
+	etwoP -> iam();
+	return 0;
+}
+]0;karamuca_ra@cobra:~/classes/csc310/labs/lab1[karamuca_ra@cobra lab1]$ exit
+exit
+
+Script done on Thu 14 Jan 2021 12:37:06 AM EST

@@ -21,35 +21,32 @@ int main(int argc, char *argv[])
 	string arguments;
 	// check if user only ran exe w/o filename 
 	if(argc == 1) {
-		cout << "Enter the command with the format: myWc [options -wlc] filename" << endl;
+		cout << "Enter the command with the format: myWc [options -w -l -c] filename" << endl;
 		return -1;
 	}
-
-	// check if the user included arguments (argc would be 3, whereas
-	// it would be 2 if they only entered a file name)
-	if(argc == 3 ) {	
-		arguments = argv[1];
-		filename = argv[2];
-
-		// remove the '-' from the arguments
-		arguments = arguments.substr(1, arguments.length());
-		// checks for if the user wants line count, word count, and/or byte count
-		for(int i = 0; i < arguments.length(); i++) {
-			if(arguments[i] == 'l')
+	else if(argc > 2) {
+		string op;
+		for(int i = 1; i < argc; i++) {
+			if(i == argc - 1) {
+				filename = argv[i];
+				break;
+			}
+			op = argv[i];
+			op = op.substr(1, op.length());
+			if(op == "l")
 				lines = true;
-			else if(arguments[i] == 'w')
+			else if(op == "w")
 				words = true;
-			else if(arguments[i] == 'c')
+			else if(op == "c")
 				bytes = true;
 			else {
 				cout << "Incorrect option:" << endl;
-				cout << "Your options are -w, -l, or -c, in the format of 'myWc -wcl filename'" << endl;
-				cout << "You can enter any of the 3 options in one argument, or provide no options to get all information." << endl;
+				cout << "Your options are -w, -l, -c, in the format of 'myWc -w -l -c filename'" << endl;
+				cout << "You can enter any of the 3 options in any order, or provide no options to get all information." << endl;
 				return -1;
-			} 	
-		}
+			}
+		} 
 	}
-	// if no options provided, set all options to true and print all info
 	else {
 		filename = argv[1];
 		lines = true;

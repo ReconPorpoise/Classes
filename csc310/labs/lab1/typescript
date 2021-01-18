@@ -1,4 +1,4 @@
-Script started on Thu 14 Jan 2021 12:36:48 AM EST
+Script started on Thu 14 Jan 2021 01:43:26 PM EST
 ]0;karamuca_ra@cobra:~/classes/csc310/labs/lab1[?1034h[karamuca_ra@cobra lab1]$ cat tail.cpp 
 /*
  * Ronald Karamuca
@@ -79,7 +79,7 @@ void printLines(string file, int nLines)
 	// close file stream
 	infile.close();
 }
-]0;karamuca_ra@cobra:~/classes/csc310/labs/lab1[karamuca_ra@cobra lab1]$ cat wc.cpp
+]0;karamuca_ra@cobra:~/classes/csc310/labs/lab1[karamuca_ra@cobra lab1]$ cat wc.cpp 
 /*
  * Ronald Karamuca
  * 1-13-2021
@@ -100,38 +100,40 @@ int main(int argc, char *argv[])
 	bool lines, words, bytes;
 	// initialize the filename and arguments string for checks
 	string filename;
-	string arguments;
 	// check if user only ran exe w/o filename 
 	if(argc == 1) {
-		cout << "Enter the command with the format: myWc [options -wlc] filename" << endl;
+		cout << "Enter the command with the format: myWc [options -w -l -c] filename" << endl;
 		return -1;
 	}
-
-	// check if the user included arguments (argc would be 3, whereas
-	// it would be 2 if they only entered a file name)
-	if(argc == 3 ) {	
-		arguments = argv[1];
-		filename = argv[2];
-
-		// remove the '-' from the arguments
-		arguments = arguments.substr(1, arguments.length());
-		// checks for if the user wants line count, word count, and/or byte count
-		for(int i = 0; i < arguments.length(); i++) {
-			if(arguments[i] == 'l')
+	// check if they had more options
+	else if(argc > 2) {
+		string op;
+		// when we reach the end of the args list, that is the file name
+		for(int i = 1; i < argc; i++) {
+			if(i == argc - 1) {
+				filename = argv[i];
+				break;
+			}
+			// remove the '-' from each option then check if they are valid
+			// if they are, toggle the related boolean to true
+			op = argv[i];
+			op = op.substr(1, op.length());
+			if(op == "l")
 				lines = true;
-			else if(arguments[i] == 'w')
+			else if(op == "w")
 				words = true;
-			else if(arguments[i] == 'c')
+			else if(op == "c")
 				bytes = true;
+			// if the option is invalid (not -w -l or -c), let the user know it's wrong and what the options are 
 			else {
 				cout << "Incorrect option:" << endl;
-				cout << "Your options are -w, -l, or -c, in the format of 'myWc -wcl filename'" << endl;
-				cout << "You can enter any of the 3 options in one argument, or provide no options to get all information." << endl;
+				cout << "Your options are -w, -l, -c, in the format of 'myWc -w -l -c filename'" << endl;
+				cout << "You can enter any of the 3 options in any order, or provide no options to get all information." << endl;
 				return -1;
-			} 	
-		}
+			}
+		} 
 	}
-	// if no options provided, set all options to true and print all info
+	// if they only entered a filename with the exe, then set the file name to the first option
 	else {
 		filename = argv[1];
 		lines = true;
@@ -261,24 +263,31 @@ class ExtraTwo : public Base {
 
 int main() 
 {
+	// create object of class Base and call its iam()
 	Base base;
 	base.iam();
 
+	// create object of class ExtraOne and call its iam() and iam2()
+	// iam2() should be the same as Base and iam() should be overloaded
 	ExtraOne eone;
 	eone.iam();
 	eone.iam2();
 
+	// create object of class ExtraTwo and call its iam() and iam2()
+	// iam2() should be the same as Base and iam() should be overloaded
 	ExtraTwo etwo;
 	etwo.iam();
 	etwo.iam2();
 
+	// create pointers to the derived-class objects and call their methods using them
 	Base *eoneP = &eone;
 	Base *etwoP = &etwo;
 	eoneP -> iam();
 	etwoP -> iam();
+
 	return 0;
 }
 ]0;karamuca_ra@cobra:~/classes/csc310/labs/lab1[karamuca_ra@cobra lab1]$ exit
 exit
 
-Script done on Thu 14 Jan 2021 12:37:06 AM EST
+Script done on Thu 14 Jan 2021 01:43:34 PM EST

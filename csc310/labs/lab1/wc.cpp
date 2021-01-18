@@ -18,19 +18,22 @@ int main(int argc, char *argv[])
 	bool lines, words, bytes;
 	// initialize the filename and arguments string for checks
 	string filename;
-	string arguments;
 	// check if user only ran exe w/o filename 
 	if(argc == 1) {
 		cout << "Enter the command with the format: myWc [options -w -l -c] filename" << endl;
 		return -1;
 	}
+	// check if they had more options
 	else if(argc > 2) {
 		string op;
+		// when we reach the end of the args list, that is the file name
 		for(int i = 1; i < argc; i++) {
 			if(i == argc - 1) {
 				filename = argv[i];
 				break;
 			}
+			// remove the '-' from each option then check if they are valid
+			// if they are, toggle the related boolean to true
 			op = argv[i];
 			op = op.substr(1, op.length());
 			if(op == "l")
@@ -39,6 +42,7 @@ int main(int argc, char *argv[])
 				words = true;
 			else if(op == "c")
 				bytes = true;
+			// if the option is invalid (not -w -l or -c), let the user know it's wrong and what the options are 
 			else {
 				cout << "Incorrect option:" << endl;
 				cout << "Your options are -w, -l, -c, in the format of 'myWc -w -l -c filename'" << endl;
@@ -47,6 +51,7 @@ int main(int argc, char *argv[])
 			}
 		} 
 	}
+	// if they only entered a filename with the exe, then set the file name to the first option
 	else {
 		filename = argv[1];
 		lines = true;

@@ -132,18 +132,18 @@ void transactions(map<unsigned int, long> &offsetsMap, long &offset, char** argv
     // get all file names
     string mFile = argv[1];
     char* transact = argv[2];
-    char* newfile = argv[3];
+    char* outfile = argv[3];
 
     // given by Dr. Digh. 
     // make a copy as to not alter the master file
     system(("cp " + mFile + " copy.out").c_str());
 
-    // outfile must be readable, writable, binary, and appendable as to 
+    // tempfile must be readable, writable, binary, and appendable as to 
     // not accidentally overwrite data
-    // also, it is a copy of the master so we can hold temp data without 
+    // also, it is a copy of the master so we can edit data without 
     // affecting the master record
     fstream infile(transact, ios::in | ios::binary);
-    fstream outfile("copy.out", ios::in | ios::out | ios::binary | ios:: app);
+    fstream tempfile("copy.out", ios::in | ios::out | ios::binary | ios:: app);
     fstream error("ERRORS", ios::out);
 
     // get all transactions from the transaction file
@@ -157,10 +157,10 @@ void transactions(map<unsigned int, long> &offsetsMap, long &offset, char** argv
                 error << "Error in transaction number " << counter << ": cannot add---duplicate key " << addZeros(transaction -> B.isbn) << "\n";
             }
             // add the new key to the correct offset position in the map 
-            // and update the binary output file
+            // and update the binary temp file
             else {
                 offsetsMap[transaction -> B.isbn] = sizeof(BookRec) * offset++;
-                outfile.write((char *) &(transaction -> B), sizeof(BookRec));
+                tempfile.write((char *) &(transaction -> B), sizeof(BookRec));
             }
         }
         // delete condition
@@ -185,8 +185,8 @@ void transactions(map<unsigned int, long> &offsetsMap, long &offset, char** argv
                 BookRec curr;
                 // move to the offset of the current-needed record, then
                 // increase/decrease the onhand amount as needed
-                outfile.seekg(offsetsMap[transaction -> B.isbn], ios::beg);
-                outfile.read((char *) &curr, sizeof(BookRec));
+                tempfile.seekg(offsetsMap[transaction -> B.isbn], ios::beg);
+                tempfile.read((char *) &curr, sizeof(BookRec));
                 transaction -> B.onhand += curr.onhand;
 
                 // if the onhand change makes it negative, that is an error
@@ -198,7 +198,7 @@ void transactions(map<unsigned int, long> &offsetsMap, long &offset, char** argv
                 // add the new onhand count to the record by going to the 
                 // correct record offset and changing that line
                 offsetsMap[transaction -> B.isbn] = sizeof(BookRec) * offset++;
-                outfile.write((char *) &(transaction -> B), sizeof(BookRec));
+                tempfile.write((char *) &(transaction -> B), sizeof(BookRec));
             }
         }
         // change price condition
@@ -213,70 +213,87 @@ void transactions(map<unsigned int, long> &offsetsMap, long &offset, char** argv
                 // and change the price for the record at that offset,
                 // then overwrite it
                 BookRec curr;
-                outfile.seekg(offsetsMap[transaction -> B.isbn], ios::beg);
-                outfile.read((char *) &curr, sizeof(BookRec));
+                tempfile.seekg(offsetsMap[transaction -> B.isbn], ios::beg);
+                tempfile.read((char *) &curr, sizeof(BookRec));
                 transaction -> B.price += curr.price;
 
-                // write out the new price to the temp outfile (copy)
+                // write out the new price to the temp file 
                 offsetsMap[transaction -> B.isbn] = sizeof(BookRec) * offset++;
-                outfile.write((char *) &(transaction -> B), sizeof(BookRec));
+                tempfile.write((char *) &(transaction -> B), sizeof(BookRec));
             }
         }
-
         // increment the transaction counter to know what transaction we are on
         counter++;
     }
     // no more transaction errors can be encountered, close the file
     error.close();
 
-    // delete the copy file 
-    system(("rm copy.out"));
     
     // create new file with updated info
-    fstream n(newfile, ios::out | ios::binary);
+    fstream newfile(outfile, ios::out | ios::binary);
     // logic for <for-loop> from 
     // "https://stackoverflow.com/questions/1443793/iterate-keys-in-a-c-map"
     for(map<unsigned int, long>::iterator it = offsetsMap.begin(); it != offsetsMap.end(); ++it) {
         BookRec curr;
         // first is key, second is value
         // seek to the record, then read it into the buffer
-        outfile.seekg(it -> second);
-        outfile.read((char *) &curr, sizeof(BookRec));
+        tempfile.seekg(it -> second);
+        tempfile.read((char *) &curr, sizeof(BookRec));
         // write the now-correct records to the end-new file from the buffer
-        n.write((char *) &curr, sizeof(BookRec));
+        newfile.write((char *) &curr, sizeof(BookRec));
     }
+    // delete the copy file 
+    system(("rm copy.out"));
     // no more things to be added, close it
-    n.close();
+    newfile.close();
 
     // print the new record
-    printRecord(newfile);
+    printRecord(outfile);
 
     // close remaining opened files
     infile.close();
-    outfile.close();
+    tempfile.close();
 }
 
-// print the entire file
+// print the entire file (from my create.cpp)
 void printRecord(char* file) 
 {
+    // clear terminal
+    system("clear");
     // create a temp BookRec buffer
     BookRec buff;
     fstream bin(file, ios::in | ios::binary);
-    // for each line, print the info of that line
+ 
+    // print errors to the terminal 
+    fstream errors("ERRORS");
+    if(errors) 
+        cout << "Transaction Errors:\n" << errors.rdbuf() << endl;
+    errors.close();
+
+    // print the contents of the new file
+    cout << "Contents of " << file << ":\n" << "--------------------------------------------------------------------------------" << endl;
+
 	while(bin.read((char *) &buff, sizeof(buff))) {
             printInfo(buff);
     }
     bin.close();
+
+    cout << "--------------------------------------------------------------------------------" << endl;
 }
 
 // output the line contents for a BookRec buffer line
 void printInfo(BookRec buff) 
-{
+{ 
     // code from Dr. Digh.
-	cout<<" "<<setw(10)<<setfill('0')<<buff.isbn
+    // sets the output formatting restraints
+	cout.setf(ios::fixed, ios::floatfield);
+	cout.setf(ios::showpoint);
+	cout.precision(2);
+   
+	cout<<setw(10)<<setfill('0')<<buff.isbn
 	<<setw(25)<<setfill(' ')<<buff.name
 	<<setw(25)<<buff.author
-	<<setw(5)<<buff.onhand
+	<<setw(3)<<buff.onhand
 	<<setw(7)<<buff.price
 	<<setw(10)<<buff.type<<endl;
 }

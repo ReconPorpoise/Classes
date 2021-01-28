@@ -100,7 +100,6 @@ void parseData(string file)
 	outfile.close();
 
 	// print the binary file contents
-	cout << " " << endl;
 	fstream bin("library.out", ios::in | ios::binary);
 	while(bin.read((char *) &buff, sizeof(buff)))
 		printInfo(buff);
@@ -111,7 +110,7 @@ void parseData(string file)
 // output the buffer contents
 void printInfo(BookRec buff) 
 {
-	cout<<" "<<setw(10)<<setfill('0')<<buff.isbn
+	cout<<setw(10)<<setfill('0')<<buff.isbn
 	<<setw(25)<<setfill(' ')<<buff.name
 	<<setw(25)<<buff.author
 	<<setw(5)<<buff.onhand

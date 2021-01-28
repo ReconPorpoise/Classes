@@ -1,1 +1,3 @@
 Error in transaction number 1: cannot add---duplicate key 0123766891
+Error in transaction number 2: count = -1 for key 0239678325
+Error in transaction number 4: cannot delete---no such key 3391679915

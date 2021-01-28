@@ -76,6 +76,7 @@ void parseData(string file)
 		else if( prevIsbn > isbn ) {
 			cerr << "> ISBN number out of sequence on line " << line << " of data." << endl;
 			buff.isbn = isbn;
+			outfile.write((char *) &buff, sizeof(BookRec));
 			printInfo(buff);
 		}
 		// check if the onhand value is negative

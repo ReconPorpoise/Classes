@@ -115,6 +115,8 @@ void diff(int argc, char** argv, int flags, int offset)
                 else if(flags == 1 || flags == 3) {
                     int chI = (int)ch;
                     int ch2I = (int)ch2;
+                    cout.flush();
+
                     // convert the number to decimal then octal
                     string oct1 = decToOct(chI);
                     string oct2 = decToOct(ch2I);

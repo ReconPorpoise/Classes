@@ -11,13 +11,13 @@ int main()
 {
     string myInput = "93 93 93 93 92 91 91 94 94 94 94 94 95 95 95 73 73 73 73 73 73 73";
 
-    cout << "Original input: " << myInput << endl;
+    cout << "Original input:\t\t" << myInput << endl;
 
     string compressedInput = compress(myInput);
-    cout << "After compression: " << compressedInput << endl;
+    cout << "After compression:\t" << compressedInput << endl;
 
     string uncompressed = decompress(compressedInput); 
-    cout << "After decompression: " << uncompressed << endl;
+    cout << "After decompression:\t" << uncompressed << endl;
 
 }
 

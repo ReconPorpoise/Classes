@@ -9,6 +9,7 @@
 #include "file.h"
 using namespace std;
 using recursive_directory_iterator = filesystem::recursive_directory_iterator;
+namespace fs = std::filesystem;
 
 int argCheck(int argc, char** argv);
 File getInfo(const char* filename); 
@@ -16,6 +17,7 @@ vector<File> getCwdFiles(int argc, char** argv);
 vector<File> getAllFiles(vector<File> cwdFiles);
 void compressFiles(int argc, char** argv);
 void tfOption(char* filename);
+void extractFiles(char* filename);
 
 int main(int argc, char** argv)
 {
@@ -51,8 +53,12 @@ int argCheck(int argc, char** argv)
             return 1;
         }
         else if(strcmp(argv[1], "-xf") == 0) {
-            // if(argv[2] is valid)
-                // call -xf
+            fstream test(argv[2]);
+            if(test) {
+                test.close();
+                extractFiles(argv[2]);
+            }
+            test.close();
             return 1;
         }
         else {
@@ -63,14 +69,12 @@ int argCheck(int argc, char** argv)
     else if(argc > 3) {
         if(strcmp(argv[1], "-cf") == 0) {
             for(int i = 3; i < argc; i++) {
-                struct stat buf;
-                lstat (argv[i], &buf);
-                if (!S_ISDIR(buf.st_mode) && !S_ISREG(buf.st_mode)) {
+                if(!fs::exists(argv[i])) {
                     cout << "Invalid file... try again." << endl;
                     return -1;
                 }
-                compressFiles(argc, argv);
             }
+            compressFiles(argc, argv);
             return 1;
         }
         else {
@@ -197,6 +201,31 @@ void tfOption(char* filename)
         cout << curr.getName() << endl;
         if(!curr.isADir()) {
             infile.seekg(stoi(curr.getSize()), ios::cur);
+        }
+    }
+    infile.close();
+}
+
+// uncompresses our .tar file
+void extractFiles(char* filename)
+{
+    fstream infile(filename, ios::in | ios::binary);
+
+    // let's get the number of entries to know how many times we need to pull info from the archive
+    int numEntities;
+    infile.read((char*) &numEntities, sizeof(int));
+
+    // get each file object from the binary
+    for(int i = 0; i < numEntities; i++) {
+        File curr;
+        infile.read((char*) &curr, sizeof(File));
+
+        // if it's a directory, create the dir
+        if(curr.isADir()) {
+
+        }
+        else {
+
         }
     }
     infile.close();

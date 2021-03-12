@@ -44,15 +44,21 @@ int argCheck(int argc, char** argv)
     }
     else if(argc == 3) {
         if(strcmp(argv[1], "-tf") == 0) {
-            if(fs::exists(argv[2])) {
+			fstream test(argv[2]);
+            if(test) {
+				test.close();
                 tfOption(argv[2]);
             }
+			test.close();
             return 1;
         }
         else if(strcmp(argv[1], "-xf") == 0) {
-            if(fs::exists(argv[2])) {
+			fstream test(argv[2]);
+            if(test) {
+				test.close();
                 extractFiles(argv[2]);
             }
+			test.close();
             return 1;
         }
         else {

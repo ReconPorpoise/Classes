@@ -48,11 +48,19 @@ int argCheck(int argc, char** argv)
         if(strcmp(argv[1], "-tf") == 0) {
             if(fileExists(argv[2])) 
                 tfOption(argv[2]);
+            else {
+                cout << "Incorrect arguments... try <jtar --help>" << endl;
+                return -1;
+            }
             return 1;
         }
         else if(strcmp(argv[1], "-xf") == 0) {
             if(fileExists(argv[2])) 
                 extractFiles(argv[2]);
+            else {
+                cout << "Incorrect arguments... try <jtar --help>" << endl;
+                return -1;
+            }
             return 1;
         }
         else {
@@ -226,15 +234,16 @@ void extractFiles(char* filename)
     for(int i = 0; i < numEntities; i++) {
         File curr;
         infile.read((char*) &curr, sizeof(File));
-
-        // if it's a directory, create the dir; -p makes all parent directories
-        if(curr.isADir()) {
-            string command = "mkdir -p ";
-            command += curr.getName();
-            system(command.c_str());
-        }
+        
         // if a file, write out its contents to it
-        else {
+        if(!curr.isADir()) {
+            /////////////////////////////////////////////////////////////
+            cout << curr.getName() << endl;
+            string createDir = "mkdir -p '${curr.getName()%/*}'";
+            string arg = "$";
+            /////////////////////////////////////////////////////////////
+            
+            system(createDir.c_str());
             string command = "touch -t ";
             command += curr.getStamp();
             command += " ";

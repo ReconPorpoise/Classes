@@ -1,4 +1,3 @@
-
 #include "file.h"
 
 bool File::isADir() const

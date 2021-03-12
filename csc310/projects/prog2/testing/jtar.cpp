@@ -123,7 +123,9 @@ vector<File> getCwdFiles(int argc, char** argv)
 // get a list of all nested files
 vector<File> getAllFiles(vector<File> cwdFiles)
 {
+    // vector to hold file objects
     vector<File> allFiles;
+    // for each file the user input, if it's a directory, get all sub-files in it
     for(int i = 0; i < cwdFiles.size(); i++) {
         if(cwdFiles[i].isADir()) {
             for(const auto& dirEntry : recursive_directory_iterator(cwdFiles[i].getName())) {
@@ -131,12 +133,10 @@ vector<File> getAllFiles(vector<File> cwdFiles)
                 allFiles.push_back(getInfo(path.c_str()));
             }
         }
+        // otherwise just push the file object to the vector
         else {
             allFiles.push_back(cwdFiles[i]);
         }
-    }
-    for(File x:allFiles) {
-        cout << x.getName() << endl;
     }
 
     return allFiles;
@@ -146,5 +146,37 @@ vector<File> getAllFiles(vector<File> cwdFiles)
 void compressFiles(int argc, char** argv)
 {
     vector<File> fileList = getCwdFiles(argc, argv);
-    vector<File> testPlzWork = getAllFiles(fileList);
+    vector<File> allFiles = getAllFiles(fileList);
+
+    // create the archive file ready for output
+    fstream output(argv[2], ios::out | ios::binary);
+
+    int numEntries = allFiles.size();
+    output.write((char*) &numEntries, sizeof(int));
+
+    // for each file entry in the vector
+    for(File entry: allFiles) {
+        // write out its size; if it's a file, write out its content as well
+        output.write((char*) &entry, sizeof(File));
+
+        if(!entry.isADir()) {
+            fstream curr(entry.getName().c_str(), ios::in);
+            int size = stoi(entry.getSize());
+        
+            char* fileContent = new char[size + 1];
+            curr.read(fileContent, size);
+
+            output.write(fileContent, size);
+
+            curr.close();
+            ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            fileContent[size] = '\0';
+            cout << fileContent << endl;
+            ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            delete[] fileContent;
+            fileContent = NULL;
+        }
+    }
+    output.close(); 
+
 }

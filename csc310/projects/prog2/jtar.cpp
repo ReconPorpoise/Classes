@@ -161,10 +161,12 @@ void compressFiles(int argc, char** argv)
 
         if(!entry.isADir()) {
             fstream curr(entry.getName().c_str(), ios::in);
-            char* fileContent = new char[stoi(entry.getSize())];
-            curr.read(fileContent, stoi(entry.getSize()));
+            int size = stoi(entry.getSize());
+        
+            char* fileContent = new char[size];
+            curr.read(fileContent, size);
 
-            output.write(fileContent, stoi(entry.getSize()));
+            output.write(fileContent, size);
 
             curr.close();
             delete[] fileContent;
@@ -172,5 +174,4 @@ void compressFiles(int argc, char** argv)
         }
     }
     output.close(); 
-
 }

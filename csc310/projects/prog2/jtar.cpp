@@ -13,6 +13,7 @@ namespace fs = std::filesystem;
 
 int argCheck(int argc, char** argv);
 File getInfo(const char* filename); 
+bool fileExists(char* filename);
 vector<File> getCwdFiles(int argc, char** argv);
 vector<File> getAllFiles(vector<File> cwdFiles);
 void compressFiles(int argc, char** argv);
@@ -32,9 +33,10 @@ int argCheck(int argc, char** argv)
 {
     if(argc == 2) {
         if(strcmp(argv[1], "--help") == 0) {
-            cout << "<jtar -cf tarfile file1 dir1...> allows you to make a tar file named <tarfile> including the files given as arguments." << endl; 
-            cout << "<jtar -tf tarfile> lists all the files and directories that are in the tar file." << endl;
-            cout << "<jtar -xf tarfile> decompresses the <tarfile> back into its original files and directories." << endl;
+            system("clear");
+            cout << "\t<jtar -cf tarfile file1 dir1...> allows you to make a tar file named <tarfile> including the files given as arguments." << endl; 
+            cout << "\t<jtar -tf tarfile> lists all the files and directories that are in the tar file." << endl;
+            cout << "\t<jtar -xf tarfile> decompresses the <tarfile> back into its original files and directories." << endl;
             return 1;
         }
         else {
@@ -44,21 +46,13 @@ int argCheck(int argc, char** argv)
     }
     else if(argc == 3) {
         if(strcmp(argv[1], "-tf") == 0) {
-			fstream test(argv[2]);
-            if(test) {
-				test.close();
+            if(fileExists(argv[2])) 
                 tfOption(argv[2]);
-            }
-			test.close();
             return 1;
         }
         else if(strcmp(argv[1], "-xf") == 0) {
-			fstream test(argv[2]);
-            if(test) {
-				test.close();
+            if(fileExists(argv[2])) 
                 extractFiles(argv[2]);
-            }
-			test.close();
             return 1;
         }
         else {
@@ -69,7 +63,7 @@ int argCheck(int argc, char** argv)
     else if(argc > 3) {
         if(strcmp(argv[1], "-cf") == 0) {
             for(int i = 3; i < argc; i++) {
-                if(!fs::exists(argv[i])) {
+                if(!fileExists(argv[i])) {
                     cout << "Invalid file... try again." << endl;
                     return -1;
                 }
@@ -78,12 +72,12 @@ int argCheck(int argc, char** argv)
             return 1;
         }
         else {
-            cout << "Incorrect arguments... try <jtar -- help>" << endl;
+            cout << "Incorrect arguments... try <jtar --help>" << endl;
             return -1;
         }
     }
     else {
-        cout << "Incorrect arguments... try <jtar -- help>" << endl;
+        cout << "Incorrect arguments... try <jtar --help>" << endl;
         return -1;
     }
 }
@@ -111,11 +105,24 @@ File getInfo(const char* filename)
 
     // create File object, check if it is a directory, then return it
     File toReturn(filename, permission.c_str(), size.c_str(), stamp);
-    if (S_ISDIR(buf.st_mode))
+    if(S_ISDIR(buf.st_mode))
         toReturn.flagAsDir();
 
     return toReturn;
 }
+
+// check if file exists for argument check
+bool fileExists(char* filename) 
+{
+    struct stat buf;
+    lstat(filename, &buf);
+    if(S_ISDIR(buf.st_mode))
+        return true;
+    if(S_ISREG(buf.st_mode))
+        return true;
+    return false;
+}
+
 
 // get a list of all the files in the current working directory
 vector<File> getCwdFiles(int argc, char** argv) 

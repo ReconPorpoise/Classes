@@ -15,6 +15,7 @@ File getInfo(const char* filename);
 vector<File> getCwdFiles(int argc, char** argv);
 vector<File> getAllFiles(vector<File> cwdFiles);
 void compressFiles(int argc, char** argv);
+void tfOption(char* filename);
 
 int main(int argc, char** argv)
 {
@@ -22,7 +23,6 @@ int main(int argc, char** argv)
     if(code == -1) {
         return 1;
     }
-    compressFiles(argc, argv);
     return 0;
 }
 
@@ -42,8 +42,12 @@ int argCheck(int argc, char** argv)
     }
     else if(argc == 3) {
         if(strcmp(argv[1], "-tf") == 0) {
-            // if(argv[2] is valid)
-                // call -tf
+            fstream test(argv[2]);
+            if(test) {
+                test.close();
+                tfOption(argv[2]);
+            }
+            test.close();
             return 1;
         }
         else if(strcmp(argv[1], "-xf") == 0) {
@@ -65,7 +69,7 @@ int argCheck(int argc, char** argv)
                     cout << "Invalid file... try again." << endl;
                     return -1;
                 }
-                // call -cf function
+                compressFiles(argc, argv);
             }
             return 1;
         }
@@ -174,4 +178,26 @@ void compressFiles(int argc, char** argv)
         }
     }
     output.close(); 
+}
+
+// tf prints all the file/directory names in the archive file
+void tfOption(char* filename)
+{
+    // open filestream for the archive file
+    fstream infile(filename, ios::in | ios::binary);
+
+    // let's get the number of entries to know how many times we need to pull info from the archive
+    int numEntities;
+    infile.read((char*) &numEntities, sizeof(int));
+
+    // print each file's name; if it's a file, seekg to past the content of the file
+    for(int i = 0; i < numEntities; i++) {
+        File curr;
+        infile.read((char*) &curr, sizeof(File));
+        cout << curr.getName() << endl;
+        if(!curr.isADir()) {
+            infile.seekg(stoi(curr.getSize()), ios::cur);
+        }
+    }
+    infile.close();
 }

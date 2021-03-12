@@ -15,6 +15,7 @@ File getInfo(const char* filename);
 vector<File> getCwdFiles(int argc, char** argv);
 vector<File> getAllFiles(vector<File> cwdFiles);
 void compressFiles(int argc, char** argv);
+void tfOption(char* filename);
 
 int main(int argc, char** argv)
 {
@@ -22,7 +23,6 @@ int main(int argc, char** argv)
     if(code == -1) {
         return 1;
     }
-    compressFiles(argc, argv);
     return 0;
 }
 
@@ -42,8 +42,12 @@ int argCheck(int argc, char** argv)
     }
     else if(argc == 3) {
         if(strcmp(argv[1], "-tf") == 0) {
-            // if(argv[2] is valid)
-                // call -tf
+            fstream test(argv[2]);
+            if(test) {
+                test.close();
+                tfOption(argv[2]);
+            }
+            test.close();
             return 1;
         }
         else if(strcmp(argv[1], "-xf") == 0) {
@@ -65,7 +69,7 @@ int argCheck(int argc, char** argv)
                     cout << "Invalid file... try again." << endl;
                     return -1;
                 }
-                // call -cf function
+                compressFiles(argc, argv);
             }
             return 1;
         }
@@ -163,20 +167,33 @@ void compressFiles(int argc, char** argv)
             fstream curr(entry.getName().c_str(), ios::in);
             int size = stoi(entry.getSize());
         
-            char* fileContent = new char[size + 1];
+            char* fileContent = new char[size];
             curr.read(fileContent, size);
 
             output.write(fileContent, size);
 
             curr.close();
-            ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            fileContent[size] = '\0';
-            cout << fileContent << endl;
-            ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
             delete[] fileContent;
             fileContent = NULL;
         }
     }
     output.close(); 
+}
 
+// tf prints all the file/directory names in the archive file
+void tfOption(char* filename)
+{
+    fstream infile(filename, ios::in | ios::binary);
+
+    int numEntities;
+    infile.read((char*) &numEntities, sizeof(int));
+
+    for(int i = 0; i < numEntities; i++) {
+        File curr;
+        infile.read((char*) &curr, sizeof(File));
+        cout << curr.getName() << endl;
+        if(!curr.isADir()) {
+            infile.seekg(stoi(curr.getSize()), ios::cur);
+        }
+    }
 }

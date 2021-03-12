@@ -216,10 +216,26 @@ void extractFiles(char* filename)
 
         // if it's a directory, create the dir
         if(curr.isADir()) {
-
+            string command = "mkdir -p ";
+            command += curr.getName();
+            system(command.c_str());
         }
         else {
+            string command = "touch -t ";
+            command += curr.getStamp();
+            command += " ";
+            command += curr.getName();
+            system(command.c_str());
 
+            int size = stoi(curr.getSize());
+            char* fileContent = new char[size];
+            infile.read(fileContent, size);
+
+            fstream temp(curr.getName(), ios::out);
+            temp.write(fileContent, size);
+            temp.close();
+            delete[] fileContent;
+            fileContent = NULL;
         }
     }
     infile.close();

@@ -214,12 +214,29 @@ void extractFiles(char* filename)
         File curr;
         infile.read((char*) &curr, sizeof(File));
 
-        // if it's a directory, create the dir
+        // if it's a directory, create the dir; -p makes all parent directories
         if(curr.isADir()) {
-
+            string command = "mkdir -p ";
+            command += curr.getName();
+            system(command.c_str());
         }
+        // if a file, write out its contents to it
         else {
+            string command = "touch -t ";
+            command += curr.getStamp();
+            command += " ";
+            command += curr.getName();
+            system(command.c_str());
 
+            int size = stoi(curr.getSize());
+            char* fileContent = new char[size];
+            infile.read(fileContent, size);
+
+            fstream temp(curr.getName(), ios::out);
+            temp.write(fileContent, size);
+            temp.close();
+            delete[] fileContent;
+            fileContent = NULL;
         }
     }
     infile.close();

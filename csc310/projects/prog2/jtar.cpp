@@ -71,10 +71,14 @@ int argCheck(int argc, char** argv)
     else if(argc > 3) {
         if(strcmp(argv[1], "-cf") == 0) {
             for(int i = 3; i < argc; i++) {
-                if(!fileExists(argv[i])) {
+                // if(!fileExists(argv[i])) {
+                fstream test(argv[i]);
+                if(!test && !fileExists(argv[i])) {
+                    test.close();
                     cout << "Invalid file... try again." << endl;
                     return -1;
                 }
+                test.close();
             }
             compressFiles(argc, argv);
             return 1;

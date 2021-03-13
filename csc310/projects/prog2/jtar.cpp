@@ -151,6 +151,7 @@ vector<File> getAllFiles(vector<File> cwdFiles)
     // for each file the user input, if it's a directory, get all sub-files in it
     for(int i = 0; i < cwdFiles.size(); i++) {
         if(cwdFiles[i].isADir()) {
+            allFiles.push_back(cwdFiles[i]);
             for(const auto& dirEntry : recursive_directory_iterator(cwdFiles[i].getName())) {
                 string path = dirEntry.path();
                 allFiles.push_back(getInfo(path.c_str()));
@@ -256,7 +257,7 @@ void extractFiles(char* filename)
         }
         // if directory, make the directory and any missing parent directories
         else {
-            string makeDir = "mkdir -p ";
+            string makeDir = "mkdir ";
             makeDir += curr.getName();
             system(makeDir.c_str());
         }

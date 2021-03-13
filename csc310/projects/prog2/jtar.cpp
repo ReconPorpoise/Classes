@@ -234,22 +234,16 @@ void extractFiles(char* filename)
     for(int i = 0; i < numEntities; i++) {
         File curr;
         infile.read((char*) &curr, sizeof(File));
-        
-        // if a file, write out its contents to it
+
+        // if it's a file, add it with its timestamp
         if(!curr.isADir()) {
-            /////////////////////////////////////////////////////////////
-            cout << curr.getName() << endl;
-            string createDir = "mkdir -p '${curr.getName()%/*}'";
-            string arg = "$";
-            /////////////////////////////////////////////////////////////
-            
-            system(createDir.c_str());
             string command = "touch -t ";
             command += curr.getStamp();
             command += " ";
             command += curr.getName();
             system(command.c_str());
-
+        
+            // move file contents to the file
             int size = stoi(curr.getSize());
             char* fileContent = new char[size];
             infile.read(fileContent, size);
@@ -260,6 +254,19 @@ void extractFiles(char* filename)
             delete[] fileContent;
             fileContent = NULL;
         }
+        // if directory, make the directory and any missing parent directories
+        else {
+            string makeDir = "mkdir -p ";
+            makeDir += curr.getName();
+            system(makeDir.c_str());
+        }
+
+        // add the correct file permissions
+        string permissions = "chmod ";
+        permissions += curr.getPmode();
+        permissions += " ";
+        permissions += curr.getName();
+        system(permissions.c_str());
     }
     infile.close();
 }

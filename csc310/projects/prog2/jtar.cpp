@@ -33,10 +33,7 @@ int argCheck(int argc, char** argv)
 {
     if(argc == 2) {
         if(strcmp(argv[1], "--help") == 0) {
-            system("clear");
-            cout << "\t<jtar -cf tarfile file1 dir1...> allows you to make a tar file named <tarfile> including the files given as arguments." << endl; 
-            cout << "\t<jtar -tf tarfile> lists all the files and directories that are in the tar file." << endl;
-            cout << "\t<jtar -xf tarfile> decompresses the <tarfile> back into its original files and directories." << endl;
+            system("cat help");
             return 1;
         }
         else {
@@ -49,7 +46,7 @@ int argCheck(int argc, char** argv)
             if(fileExists(argv[2])) 
                 tfOption(argv[2]);
             else {
-                cout << "Incorrect arguments... try <jtar --help>" << endl;
+                cout << "Invalid file [" << argv[2] << "]... try again." << endl;
                 return -1;
             }
             return 1;
@@ -58,7 +55,7 @@ int argCheck(int argc, char** argv)
             if(fileExists(argv[2])) 
                 extractFiles(argv[2]);
             else {
-                cout << "Incorrect arguments... try <jtar --help>" << endl;
+                cout << "Invalid file [" << argv[2] << "]... try again." << endl;
                 return -1;
             }
             return 1;
@@ -71,11 +68,10 @@ int argCheck(int argc, char** argv)
     else if(argc > 3) {
         if(strcmp(argv[1], "-cf") == 0) {
             for(int i = 3; i < argc; i++) {
-                // if(!fileExists(argv[i])) {
                 fstream test(argv[i]);
-                if(!test && !fileExists(argv[i])) {
+                if(!fileExists(argv[i]) && !test) {
                     test.close();
-                    cout << "Invalid file... try again." << endl;
+                    cout << "Invalid file [" << argv[i] << "]... try again." << endl;
                     return -1;
                 }
                 test.close();
@@ -92,6 +88,14 @@ int argCheck(int argc, char** argv)
         cout << "Incorrect arguments... try <jtar --help>" << endl;
         return -1;
     }
+}
+
+// check if file exists for argument check
+bool fileExists(char* filename) 
+{
+    if(fs::exists(filename))
+        return true;
+    return false;
 }
 
 // check if it is a file or dir, get permissions, size, and time
@@ -122,19 +126,6 @@ File getInfo(const char* filename)
 
     return toReturn;
 }
-
-// check if file exists for argument check
-bool fileExists(char* filename) 
-{
-    struct stat buf;
-    lstat(filename, &buf);
-    if(S_ISDIR(buf.st_mode))
-        return true;
-    if(S_ISREG(buf.st_mode))
-        return true;
-    return false;
-}
-
 
 // get a list of all the files in the current working directory
 vector<File> getCwdFiles(int argc, char** argv) 
@@ -261,9 +252,11 @@ void extractFiles(char* filename)
         }
         // if directory, make the directory and any missing parent directories
         else {
-            string makeDir = "mkdir ";
-            makeDir += curr.getName();
-            system(makeDir.c_str());
+            if(!fs::exists(curr.getName())) {
+                string makeDir = "mkdir ";
+                makeDir += curr.getName();
+                system(makeDir.c_str());
+            }
         }
 
         // add the correct file permissions

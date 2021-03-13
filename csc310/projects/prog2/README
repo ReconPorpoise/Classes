@@ -1,0 +1,5 @@
+Project 2: jtar
+---------------
+The goal of this project is to recreate the Linux tar command for 
+compressing multiple files and directories, while preserving their
+timestamps, permissions, and data.

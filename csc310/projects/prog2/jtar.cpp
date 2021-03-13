@@ -256,6 +256,11 @@ void extractFiles(char* filename)
                 string makeDir = "mkdir ";
                 makeDir += curr.getName();
                 system(makeDir.c_str());
+                string timestamp = "touch -t ";
+                timestamp += curr.getStamp();
+                timestamp += " ";
+                timestamp += curr.getName();
+                system(timestamp.c_str());
             }
         }
 

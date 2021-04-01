@@ -13,7 +13,7 @@ public:
   bool operator < (Song another) const { return title < another.title;}
 };
 
-ostream & operator << (ostream& out, Song & l) {     
+inline ostream & operator << (ostream& out, Song & l) {     
         cout << l.track << ".  " << l.title << " " << l.time/100 << ":";
         if ((l.time % 100) < 10) cout << "0";
         cout << l.time % 100;
@@ -22,7 +22,7 @@ ostream & operator << (ostream& out, Song & l) {
 
 class Album {
   public :
-    map<int, Song> songs;
+    mutable map<int, Song> songs;
     string name;  // Album's name
     string artist;
     string genre;

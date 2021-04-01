@@ -2,12 +2,16 @@
 #include <iostream>
 #include <map>
 #include <vector>
+#include "mp3.cpp"
 using namespace std;
 
 
 int main(int argc, char** argv) 
 {
-	
+	Artist curr;
+	curr.name = "Ron";
+	curr.time = 12.5;
+	curr.nsongs = 15;
 
 	return 0;
 }

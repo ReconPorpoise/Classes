@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <fstream>
 #include <iostream>
 #include <map>
@@ -8,6 +9,7 @@
 using namespace std;
 
 void makeList(set<Artist>& artists, string fileName);
+void printList(set<Artist> artists);
 
 int main(int argc, char** argv) 
 {
@@ -18,6 +20,7 @@ int main(int argc, char** argv)
 
 	set<Artist> artists;
 	makeList(artists, argv[1]);
+	printList(artists);
 	
 	return 0;
 }
@@ -40,7 +43,9 @@ void makeList(set<Artist>& artists, string fileName) {
 		string genre = info[4];
 		string track = info[5]; 		
 
-		if(artists.find(artist) == artists.end()) {
+		// gets the artist position
+		set<Artist>::iterator artFind = find(artists.begin(), artists.end(), artist);
+		if(artFind == artists.end()) {
 			// create new artist
 			Artist newArtist;
 			newArtist.name = artist;
@@ -53,7 +58,6 @@ void makeList(set<Artist>& artists, string fileName) {
 			newAlbum.genre = genre;
 			newAlbum.time += stoi(time);
 			newAlbum.nsongs++;
-
 			// create new song
 			Song newSong;
 			newSong.title = song;
@@ -62,55 +66,58 @@ void makeList(set<Artist>& artists, string fileName) {
 	
 			newAlbum.songs[stoi(track)] = newSong;
 			newArtist.albums.insert(newAlbum);
+	
+			artists.insert(newArtist);
 		}
-		// if artist exists and album doesn't:
+		// if artist exists:
 		else {
-			set<Artist>::iterator it;
-			for(it = artists.begin(); it != artists.end(); it++) {
-				set<Album>::iterator it2;
-				bool found = false;
-				for(it2 = it.albums.begin(); it != it2.albums.end(); i2++) {
-					if(it.name == album)
-						found = true;
-					if(found) {
-						Song newSong;
-						newSong.title = song;
-						newSong.time = stoi(time);
-						newSong.track = stoi(track);
-						it.albums.songs[stoi(track)] = newSong;
-						break;
-					}
-				}
-				if(!found) {
-					Album newAlbum;
-					newAlbum.name = album;
-					newAlbum.artist = artist;
-					newAlbum.genre = genre;
-					newAlbum.time += stoi(time);
-					newAlbum.nsongs++;
+			Artist cArt = *artFind;
+			set<Album>::iterator albFind = find(cArt.albums.begin(), cArt.albums.end(), album);
+			// if album doesn't exist:
+			if(albFind == cArt.albums.end()) {
+				// create new album
+				Album newAlbum;
+				newAlbum.name = album;
+				newAlbum.artist = artist;
+				newAlbum.genre = genre;
+				newAlbum.time += stoi(time);
+				newAlbum.nsongs++;
 
-					// create new song
-					Song newSong;
-					newSong.title = song;
-					newSong.time = stoi(time);
-					newSong.track = stoi(track);
-			
-					newAlbum.songs[stoi(track)] = newSong;
-				}
+				// create and add song to it
+				Song newSong;
+				newSong.title = song;
+				newSong.time = stoi(time);
+				newSong.track = stoi(track);
+				
+				// add song to album
+				newAlbum.songs[stoi(track)] = newSong;
+
+				// add album to artist
+				cArt.albums.insert(newAlbum);
 			}
+			// if album exists:
+			else {
+				Album cAlb = *albFind;
+
+				// create and add new song
+				Song newSong;
+				newSong.title = song;
+				newSong.time = stoi(time);
+				newSong.track = stoi(track);	
+				cAlb.songs[stoi(track)] = newSong;
+			
+				// increase album and artist time and song count
+				cAlb.time += stoi(time);
+				cAlb.nsongs++;
+				cArt.time += stoi(time);
+				cArt.nsongs++;
+			}		
 		}
 	}
 	infile.close();
 }
 
-// song -> time -> artist -> album -> genre -> track number
-
-/* TODO:
- * - Use a map named songs for all Album objects that will use track num as primary key for a Song object
- * - All artists are to be printed sorted lexicographically, with artist name, comma and space, and total runtime of all songs
- *  	- after each artist, we print their albums (sorted lexicographically) followed by their number of songs and runtime for the album
- *  		- after each album, print each song sorted by track number (16 spaces, track number, a period, a space, the song name, colon, space, song time.
- *  	*make sure all underscores become spaces
- * - (This is in mp3.cpp) Check if artist already exists in vector, if they do, check if the album exists, if it does, add the song, if not, add the album and the song. 
- *   	- if artist doesn't exist, add the artist, album, and song
- */
+void printList(set<Artist> artists) 
+{
+	
+}

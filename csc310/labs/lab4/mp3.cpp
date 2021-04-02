@@ -3,6 +3,8 @@
 #include <map>
 #include <algorithm>
 #include <vector>
+#include <string>
+#include <set>
 using namespace std;
 
 class Song {
@@ -13,11 +15,12 @@ public:
   bool operator < (Song another) const { return title < another.title;}
 };
 
+//this operator writes out the song in the correct format
 inline ostream & operator << (ostream& out, Song & l) {     
-        cout << l.track << ".  " << l.title << " " << l.time/100 << ":";
-        if ((l.time % 100) < 10) cout << "0";
-        cout << l.time % 100;
-		return out;
+  cout << "\t\t" << l.track << ".  " << l.title << ": " << l.time/100 << ":";
+  if ((l.time % 100) < 10) cout << "0";
+  cout << l.time % 100;
+  return out;
 }
 
 class Album {
@@ -26,15 +29,46 @@ class Album {
     string name;  // Album's name
     string artist;
     string genre;
-    int time;     // Total time of all songs on album
-    int nsongs;   // Total number of songs on album
+    mutable int time;     // Total time of all songs on album
+    mutable int nsongs;   // Total number of songs on album
+
+    bool operator < (Album another) const { return name < another.name;}
+    bool operator == (string albumName) const { return name == albumName;}
+    friend std::ostream& operator<<(std::ostream& out, const Album& al);
 };
+
+//this operator writes out the album in the correct format
+ostream& operator<<(ostream& out, const Album& al)
+{
+  cout << "\t" << al.name << ": " << al.nsongs << ", " << al.time/100 << ":";
+  if ((al.time % 100) < 10) cout << "0";
+  cout << al.time % 100 << endl;
+  for (map<int, Song>::const_iterator it=al.songs.begin(); it!=al.songs.end(); ++it){
+    Song curSong = it->second;
+    cout << curSong;
+  }
+  return out;
+}
 
 class Artist {
    public :
      string name; // Artist's name
+     set<Album> albums; // Artist's Albums
      int time;    // Total time of all songs on all albums by this artist
      int nsongs;  // Total number of songs on all albums by this artist
+
      bool operator < (Artist another) const { return name < another.name;}
+     bool operator == (string artistName) const { return name == artistName;}
+     friend std::ostream& operator<<(std::ostream& out, const Artist& ar);
 };
 
+//this operator writes out the artist in the correct format
+ostream& operator<<(ostream& out, const Artist& ar)
+{
+  cout << ar.name << ": " << ar.nsongs << ", " << ar.time/100 << ":";
+  if ((ar.time % 100) < 10) cout << "0";
+  cout << ar.time % 100 << endl;
+  for (set<Album>::iterator it=ar.albums.begin(); it!=ar.albums.end(); ++it)
+    cout << *it;
+  return out;
+}

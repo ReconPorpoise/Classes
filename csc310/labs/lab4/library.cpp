@@ -5,38 +5,16 @@
 #include "mp3.cpp"
 using namespace std;
 
-
 int main(int argc, char** argv) 
 {
-	Artist curr;
-	curr.name = "Ron";
-	curr.time = 12.5;
-	curr.nsongs = 15;
-
+	if(argc != 2) {
+		cout << "mp3: missing filename 'mp3'" << endl;
+		return 1;
+	}
+	
 	return 0;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 /* TODO:
- * - Make a makefile for the program to include mp3.cpp and library.cpp
- * - File contents will be valid, check if file exists
- *   	- error output "mp3: missing filename 'filename'".
  * - Use a map named songs for all Album objects that will use track num as primary key for a Song object
  * - All artists are to be printed sorted lexicographically, with artist name, comma and space, and total runtime of all songs
  *  	- after each artist, we print their albums (sorted lexicographically) followed by their number of songs and runtime for the album

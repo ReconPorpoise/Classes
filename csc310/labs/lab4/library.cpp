@@ -1,12 +1,13 @@
 #include <fstream>
 #include <iostream>
 #include <map>
+#include <set>
 #include <sstream>
 #include <vector>
 #include "mp3.cpp"
 using namespace std;
 
-void makeList(vector<Artist>& artists, string fileName);
+void makeList(set<Artist>& artists, string fileName);
 
 int main(int argc, char** argv) 
 {
@@ -15,13 +16,13 @@ int main(int argc, char** argv)
 		return 1;
 	}
 
-	vector<Artist> artists;
+	set<Artist> artists;
 	makeList(artists, argv[1]);
 	
 	return 0;
 }
 
-void makeList(vector<Artist>& artists, string fileName) {
+void makeList(set<Artist>& artists, string fileName) {
 	fstream infile(fileName.c_str(), ios::in);
 	string currRecord = "";
 	while(getline(infile, currRecord)) {
@@ -36,12 +37,73 @@ void makeList(vector<Artist>& artists, string fileName) {
 		string time = info[1];
 		string artist = info[2];
 		string album = info[3];
-		string track = info[4]; 		
+		string genre = info[4];
+		string track = info[5]; 		
+
+		if(artists.find(artist) == artists.end()) {
+			// create new artist
+			Artist newArtist;
+			newArtist.name = artist;
+			newArtist.time += stoi(time);
+			newArtist.nsongs++;
+			// create new album
+			Album newAlbum;
+			newAlbum.name = album;
+			newAlbum.artist = artist;
+			newAlbum.genre = genre;
+			newAlbum.time += stoi(time);
+			newAlbum.nsongs++;
+
+			// create new song
+			Song newSong;
+			newSong.title = song;
+			newSong.time = stoi(time);
+			newSong.track = stoi(track);
+	
+			newAlbum.songs[stoi(track)] = newSong;
+			newArtist.albums.insert(newAlbum);
+		}
+		// if artist exists and album doesn't:
+		else {
+			set<Artist>::iterator it;
+			for(it = artists.begin(); it != artists.end(); it++) {
+				set<Album>::iterator it2;
+				bool found = false;
+				for(it2 = it.albums.begin(); it != it2.albums.end(); i2++) {
+					if(it.name == album)
+						found = true;
+					if(found) {
+						Song newSong;
+						newSong.title = song;
+						newSong.time = stoi(time);
+						newSong.track = stoi(track);
+						it.albums.songs[stoi(track)] = newSong;
+						break;
+					}
+				}
+				if(!found) {
+					Album newAlbum;
+					newAlbum.name = album;
+					newAlbum.artist = artist;
+					newAlbum.genre = genre;
+					newAlbum.time += stoi(time);
+					newAlbum.nsongs++;
+
+					// create new song
+					Song newSong;
+					newSong.title = song;
+					newSong.time = stoi(time);
+					newSong.track = stoi(track);
+			
+					newAlbum.songs[stoi(track)] = newSong;
+				}
+			}
+		}
 	}
 	infile.close();
 }
 
-// song -> time -> artist -> album -> track number
+// song -> time -> artist -> album -> genre -> track number
 
 /* TODO:
  * - Use a map named songs for all Album objects that will use track num as primary key for a Song object

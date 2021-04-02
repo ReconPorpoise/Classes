@@ -38,11 +38,21 @@ void makeList(set<Artist>& artists, string fileName) {
 	
 		string song = info[0];
 		string time = info[1];
+		
+		int timeFix;
+		stringstream t(time);
+		string token;
+		while(getline(t, token, ':'))
+			timeFix += stoi(token);
+		
+		time = to_string(timeFix);
+		
 		string artist = info[2];
 		string album = info[3];
 		string genre = info[4];
 		string track = info[5]; 		
 
+		cout << time << endl;
 		// gets the artist position
 		set<Artist>::iterator artFind = find(artists.begin(), artists.end(), artist);
 		if(artFind == artists.end()) {
@@ -82,6 +92,8 @@ void makeList(set<Artist>& artists, string fileName) {
 				newAlbum.genre = genre;
 				newAlbum.time += stoi(time);
 				newAlbum.nsongs++;
+				cArt.nsongs++;
+				cArt.time += stoi(time);
 
 				// create and add song to it
 				Song newSong;
@@ -119,5 +131,7 @@ void makeList(set<Artist>& artists, string fileName) {
 
 void printList(set<Artist> artists) 
 {
-	
+	set<Artist>::iterator it;
+	for(it = artists.begin(); it != artists.end(); ++it)
+		cout << *it << endl;	
 }

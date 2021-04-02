@@ -3,10 +3,10 @@ CC=g++
 # CFLAGS will be the options passed to the compiler.
 CFLAGS= -c
 
-all: prog
+all: mp3
 
 prog: library.o mp3.o
-	$(CC) library.o mp3.o -o prog
+	$(CC) library.o mp3.o -o mp3
 
 library.o: library.cpp
 	$(CC) $(CFLAGS) library.cpp

@@ -17,9 +17,9 @@ public:
 
 //this operator writes out the song in the correct format
 inline ostream & operator << (ostream& out, Song & l) {     
-  cout << "\t\t" << l.track << ".  " << l.title << ": " << l.time/100 << ":";
-  if ((l.time % 100) < 10) cout << "0";
-  cout << l.time % 100;
+  cout << "\t\t" << l.track << ".  " << l.title << ": " << l.time/60 << ":";
+  if ((l.time % 60) < 10) cout << "0";
+  cout << l.time % 60;
   return out;
 }
 
@@ -40,12 +40,12 @@ class Album {
 //this operator writes out the album in the correct format
 inline ostream& operator<<(ostream& out, const Album& al)
 {
-  cout << "\t" << al.name << ": " << al.nsongs << ", " << al.time/100 << ":";
-  if ((al.time % 100) < 10) cout << "0";
-  cout << al.time % 100 << endl;
+  cout << "\t" << al.name << ": " << al.nsongs << ", " << al.time/60 << ":";
+  if ((al.time % 60) < 10) cout << "0";
+  cout << al.time % 60 << endl;
   for (map<int, Song>::const_iterator it=al.songs.begin(); it!=al.songs.end(); ++it){
     Song curSong = it->second;
-    cout << curSong;
+    cout << curSong << endl;
   }
   return out;
 }
@@ -53,7 +53,7 @@ inline ostream& operator<<(ostream& out, const Album& al)
 class Artist {
    public :
      string name; // Artist's name
-     set<Album> albums; // Artist's Albums
+     mutable set<Album> albums; // Artist's Albums
      int time;    // Total time of all songs on all albums by this artist
      int nsongs;  // Total number of songs on all albums by this artist
 
@@ -65,9 +65,9 @@ class Artist {
 //this operator writes out the artist in the correct format
 inline ostream& operator<<(ostream& out, const Artist& ar)
 {
-  cout << ar.name << ": " << ar.nsongs << ", " << ar.time/100 << ":";
-  if ((ar.time % 100) < 10) cout << "0";
-  cout << ar.time % 100 << endl;
+  cout << ar.name << ": " << ar.nsongs << ", " << ar.time/60 << ":";
+  if ((ar.time % 60) < 10) cout << "0";
+  cout << ar.time % 60 << endl;
   for (set<Album>::iterator it=ar.albums.begin(); it!=ar.albums.end(); ++it)
     cout << *it;
   return out;

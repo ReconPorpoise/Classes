@@ -10,6 +10,7 @@ using namespace std;
 
 void makeList(set<Artist>& artists, string fileName);
 void printList(set<Artist> artists);
+string under2Space(string toChange);
 
 int main(int argc, char** argv) 
 {
@@ -36,38 +37,42 @@ void makeList(set<Artist>& artists, string fileName) {
 		while(s >> temp)
 			info.push_back(temp);
 	
-		string song = info[0];
-		string time = info[1];
-		
-		int timeFix;
+		string song = under2Space(info[0]);
+		string time = info[1];		
+
+		int timeFix = 0;
+		vector<string> timePiece;
 		stringstream t(time);
 		string token;
 		while(getline(t, token, ':'))
-			timeFix += stoi(token);
-		
+			timePiece.push_back(token);
+		timeFix += stoi(timePiece[0]) * 60;
+		timeFix += stoi(timePiece[1]);
 		time = to_string(timeFix);
 		
-		string artist = info[2];
-		string album = info[3];
-		string genre = info[4];
+		string artist = under2Space(info[2]);
+		string album = under2Space(info[3]);
+		string genre = under2Space(info[4]);
 		string track = info[5]; 		
 
-		cout << time << endl;
+
 		// gets the artist position
 		set<Artist>::iterator artFind = find(artists.begin(), artists.end(), artist);
 		if(artFind == artists.end()) {
 			// create new artist
 			Artist newArtist;
 			newArtist.name = artist;
+			newArtist.time = 0;
 			newArtist.time += stoi(time);
-			newArtist.nsongs++;
+			newArtist.nsongs = 1;
 			// create new album
 			Album newAlbum;
 			newAlbum.name = album;
 			newAlbum.artist = artist;
 			newAlbum.genre = genre;
+			newAlbum.time = 0;
 			newAlbum.time += stoi(time);
-			newAlbum.nsongs++;
+			newAlbum.nsongs = 1;
 			// create new song
 			Song newSong;
 			newSong.title = song;
@@ -90,9 +95,10 @@ void makeList(set<Artist>& artists, string fileName) {
 				newAlbum.name = album;
 				newAlbum.artist = artist;
 				newAlbum.genre = genre;
+				newAlbum.time = 0;
 				newAlbum.time += stoi(time);
-				newAlbum.nsongs++;
-				cArt.nsongs++;
+				newAlbum.nsongs += 1;
+				cArt.nsongs += 1;
 				cArt.time += stoi(time);
 
 				// create and add song to it
@@ -117,14 +123,21 @@ void makeList(set<Artist>& artists, string fileName) {
 				newSong.time = stoi(time);
 				newSong.track = stoi(track);	
 				cAlb.songs[stoi(track)] = newSong;
-			
 				// increase album and artist time and song count
 				cAlb.time += stoi(time);
-				cAlb.nsongs++;
+				cAlb.nsongs += 1;
 				cArt.time += stoi(time);
-				cArt.nsongs++;
+				cArt.nsongs += 1;
+
+				// we cannot update sets... delete old replace with new
+				cArt.albums.erase(albFind);
+				cArt.albums.insert(cAlb);
 			}		
+			artists.erase(artFind);
+			artists.insert(cArt);
 		}
+		info.clear();
+		timePiece.clear();
 	}
 	infile.close();
 }
@@ -133,5 +146,17 @@ void printList(set<Artist> artists)
 {
 	set<Artist>::iterator it;
 	for(it = artists.begin(); it != artists.end(); ++it)
-		cout << *it << endl;	
+		cout << *it;
+}
+
+// convert underscores to spaces
+string under2Space(string toChange) {
+	string toReturn = "";
+	for(int i = 0; i < toChange.length(); i++) {
+		if(toChange[i] == '_')
+			toReturn += " ";
+		else
+			toReturn += toChange[i];
+	}
+	return toReturn;
 }

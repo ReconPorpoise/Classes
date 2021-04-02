@@ -5,7 +5,7 @@ CFLAGS= -c
 
 all: mp3
 
-prog: library.o mp3.o
+mp3: library.o mp3.o
 	$(CC) library.o mp3.o -o mp3
 
 library.o: library.cpp

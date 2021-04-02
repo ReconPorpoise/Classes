@@ -1,0 +1,276 @@
+Script started on Thu 01 Apr 2021 11:53:24 PM EDT
+]0;karamuca_ra@cobra:~/classes/csc310/labs/lab4[?1034h[karamuca_ra@cobra lab4]$ cat mp3.cpp 
+#include <fstream>
+#include <iostream>
+#include <map>
+#include <algorithm>
+#include <vector>
+#include <string>
+#include <set>
+using namespace std;
+
+class Song {
+public:
+  string title;
+  int time;
+  int track;      // Primary key
+  bool operator < (Song another) const { return title < another.title;}
+};
+
+//this operator writes out the song in the correct format
+inline ostream & operator << (ostream& out, Song & l) {     
+  cout << "\t\t" << l.track << ".  " << l.title << ": " << l.time/60 << ":";
+  if ((l.time % 60) < 10) cout << "0";
+  cout << l.time % 60;
+  return out;
+}
+
+class Album {
+  public :
+    mutable map<int, Song> songs;
+    string name;  // Album's name
+    string artist;
+    string genre;
+    mutable int time;     // Total time of all songs on album
+    mutable int nsongs;   // Total number of songs on album
+
+    bool operator < (Album another) const { return name < another.name;}
+    bool operator == (string albumName) const { return name == albumName;}
+    friend std::ostream& operator<<(std::ostream& out, const Album& al);
+};
+
+//this operator writes out the album in the correct format
+inline ostream& operator<<(ostream& out, const Album& al)
+{
+  cout << "\t" << al.name << ": " << al.nsongs << ", " << al.time/60 << ":";
+  if ((al.time % 60) < 10) cout << "0";
+  cout << al.time % 60 << endl;
+  for (map<int, Song>::const_iterator it=al.songs.begin(); it!=al.songs.end(); ++it){
+    Song curSong = it->second;
+    cout << curSong << endl;
+  }
+  return out;
+}
+
+class Artist {
+   public :
+     string name; // Artist's name
+     mutable set<Album> albums; // Artist's Albums
+     int time;    // Total time of all songs on all albums by this artist
+     int nsongs;  // Total number of songs on all albums by this artist
+
+     bool operator < (Artist another) const { return name < another.name;}
+     bool operator == (string artistName) const { return name == artistName;}
+     friend std::ostream& operator<<(std::ostream& out, const Artist& ar);
+};
+
+//this operator writes out the artist in the correct format
+inline ostream& operator<<(ostream& out, const Artist& ar)
+{
+  cout << ar.name << ": " << ar.nsongs << ", " << ar.time/60 << ":";
+  if ((ar.time % 60) < 10) cout << "0";
+  cout << ar.time % 60 << endl;
+  for (set<Album>::iterator it=ar.albums.begin(); it!=ar.albums.end(); ++it)
+    cout << *it;
+  return out;
+}
+]0;karamuca_ra@cobra:~/classes/csc310/labs/lab4[karamuca_ra@cobra lab4]$ cat library.cpp 
+#include <algorithm>
+#include <fstream>
+#include <iostream>
+#include <map>
+#include <set>
+#include <sstream>
+#include <vector>
+#include "mp3.cpp"
+using namespace std;
+
+void makeList(set<Artist>& artists, string fileName);
+void printList(set<Artist> artists);
+string under2Space(string toChange);
+
+int main(int argc, char** argv) 
+{
+	if(argc != 2) {
+		cout << "mp3: missing filename 'mp3'" << endl;
+		return 1;
+	}
+
+	set<Artist> artists;
+	makeList(artists, argv[1]);
+	printList(artists);
+	
+	return 0;
+}
+
+void makeList(set<Artist>& artists, string fileName) {
+	fstream infile(fileName.c_str(), ios::in);
+	string currRecord = "";
+	while(getline(infile, currRecord)) {
+		// split the line into the separate info per track
+		vector<string> info;
+		stringstream s(currRecord);
+		string temp;
+		while(s >> temp)
+			info.push_back(temp);
+	
+		string song = under2Space(info[0]);
+		string time = info[1];		
+
+		int timeFix = 0;
+		vector<string> timePiece;
+		stringstream t(time);
+		string token;
+		while(getline(t, token, ':'))
+			timePiece.push_back(token);
+		timeFix += stoi(timePiece[0]) * 60;
+		timeFix += stoi(timePiece[1]);
+		time = to_string(timeFix);
+		
+		string artist = under2Space(info[2]);
+		string album = under2Space(info[3]);
+		string genre = under2Space(info[4]);
+		string track = info[5]; 		
+
+
+		// gets the artist position
+		set<Artist>::iterator artFind = find(artists.begin(), artists.end(), artist);
+		if(artFind == artists.end()) {
+			// create new artist
+			Artist newArtist;
+			newArtist.name = artist;
+			newArtist.time = 0;
+			newArtist.time += stoi(time);
+			newArtist.nsongs = 1;
+			// create new album
+			Album newAlbum;
+			newAlbum.name = album;
+			newAlbum.artist = artist;
+			newAlbum.genre = genre;
+			newAlbum.time = 0;
+			newAlbum.time += stoi(time);
+			newAlbum.nsongs = 1;
+			// create new song
+			Song newSong;
+			newSong.title = song;
+			newSong.time = stoi(time);
+			newSong.track = stoi(track);
+	
+			newAlbum.songs[stoi(track)] = newSong;
+			newArtist.albums.insert(newAlbum);
+	
+			artists.insert(newArtist);
+		}
+		// if artist exists:
+		else {
+			Artist cArt = *artFind;
+			set<Album>::iterator albFind = find(cArt.albums.begin(), cArt.albums.end(), album);
+			// if album doesn't exist:
+			if(albFind == cArt.albums.end()) {
+				// create new album
+				Album newAlbum;
+				newAlbum.name = album;
+				newAlbum.artist = artist;
+				newAlbum.genre = genre;
+				newAlbum.time = 0;
+				newAlbum.time += stoi(time);
+				newAlbum.nsongs += 1;
+				cArt.nsongs += 1;
+				cArt.time += stoi(time);
+
+				// create and add song to it
+				Song newSong;
+				newSong.title = song;
+				newSong.time = stoi(time);
+				newSong.track = stoi(track);
+				
+				// add song to album
+				newAlbum.songs[stoi(track)] = newSong;
+
+				// add album to artist
+				cArt.albums.insert(newAlbum);
+			}
+			// if album exists:
+			else {
+				Album cAlb = *albFind;
+
+				// create and add new song
+				Song newSong;
+				newSong.title = song;
+				newSong.time = stoi(time);
+				newSong.track = stoi(track);	
+				cAlb.songs[stoi(track)] = newSong;
+				// increase album and artist time and song count
+				cAlb.time += stoi(time);
+				cAlb.nsongs += 1;
+				cArt.time += stoi(time);
+				cArt.nsongs += 1;
+
+				// we cannot update sets... delete old replace with new
+				cArt.albums.erase(albFind);
+				cArt.albums.insert(cAlb);
+			}		
+			artists.erase(artFind);
+			artists.insert(cArt);
+		}
+		info.clear();
+		timePiece.clear();
+	}
+	infile.close();
+}
+
+void printList(set<Artist> artists) 
+{
+	set<Artist>::iterator it;
+	for(it = artists.begin(); it != artists.end(); ++it)
+		cout << *it;
+}
+
+// convert underscores to spaces
+string under2Space(string toChange) {
+	string toReturn = "";
+	for(int i = 0; i < toChange.length(); i++) {
+		if(toChange[i] == '_')
+			toReturn += " ";
+		else
+			toReturn += toChange[i];
+	}
+	return toReturn;
+}
+]0;karamuca_ra@cobra:~/classes/csc310/labs/lab4[karamuca_ra@cobra lab4]$ make
+make: Nothing to be done for `all'.
+]0;karamuca_ra@cobra:~/classes/csc310/labs/lab4[karamuca_ra@cobra lab4]$ make claen[K[K[Kean
+rm -rf *.o
+]0;karamuca_ra@cobra:~/classes/csc310/labs/lab4[karamuca_ra@cobra lab4]$ make
+g++ -c library.cpp
+g++ -c mp3.cpp
+g++ library.o mp3.o -o mp3
+]0;karamuca_ra@cobra:~/classes/csc310/labs/lab4[karamuca_ra@cobra lab4]$ ./mp3
+mp3: missing filename 'mp3'
+]0;karamuca_ra@cobra:~/classes/csc310/labs/lab4[karamuca_ra@cobra lab4]$ ./mp3 music.txt 
+Coltrane, John: 4, 18:37
+	Giant Steps: 4, 18:37
+		1.  Giant Steps: 4:46
+		3.  Countdown: 2:25
+		6.  Naima: 4:24
+		7.  Mr. P.C.: 7:02
+Lyle, Bobby: 1, 5:16
+	Night Breeze: 1, 5:16
+		5.  Naima: 5:16
+Puente, Tito: 1, 4:02
+	El Rey: 1, 4:02
+		5.  Giant Steps: 4:02
+Tjader, Cal: 1, 5:36
+	A Fuego Vivo: 1, 5:36
+		6.  Naima: 5:36
+Walton, Cedar: 4, 30:44
+	Eastern Rebellion: 3, 8:38
+		2.  Naima: 8:38
+	Naima: 3, 22:06
+		2.  This Guy's In Love With You: 8:10
+		4.  Down In Brazil: 6:07
+		6.  Naima: 7:49
+]0;karamuca_ra@cobra:~/classes/csc310/labs/lab4[karamuca_ra@cobra lab4]$ exit
+exit
+
+Script done on Thu 01 Apr 2021 11:53:58 PM EDT

@@ -38,7 +38,7 @@ class Album {
 };
 
 //this operator writes out the album in the correct format
-ostream& operator<<(ostream& out, const Album& al)
+inline ostream& operator<<(ostream& out, const Album& al)
 {
   cout << "\t" << al.name << ": " << al.nsongs << ", " << al.time/100 << ":";
   if ((al.time % 100) < 10) cout << "0";
@@ -63,7 +63,7 @@ class Artist {
 };
 
 //this operator writes out the artist in the correct format
-ostream& operator<<(ostream& out, const Artist& ar)
+inline ostream& operator<<(ostream& out, const Artist& ar)
 {
   cout << ar.name << ": " << ar.nsongs << ", " << ar.time/100 << ":";
   if ((ar.time % 100) < 10) cout << "0";

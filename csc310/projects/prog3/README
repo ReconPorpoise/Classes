@@ -5,4 +5,35 @@ of storing, sorting, and accessing song album data from our Album class.
 
 To implement this, the file name must be taken in on the command line and be
 made sure of its validity. Then, Album objects must be taken in from the given
-file in the format of <UPC> <Artist> <Title> on their own lines.
+file in the format of <UPC> <Artist> <Title> on their own lines. This is done
+using the istream getline function while delimiting by '\n' and allocating
+50 bits to each of those 3 items. This was implemented by overloading the >> 
+operator to take in those 3 points.
+
+Next, we must tackle the B-Tree functions, specifically the insert, split, and
+adjust. This is typically all one operation, so it will be described as such:
+	- First, we check if the tree is empty. If it is, we add a root node
+	  with its key and increase the currSize of that node. We then adjust our 
+	  arrays accordingly (adding into the ValueArray).
+		
+	- If the tree is not empty, we check if the root node is full. If it is,
+	  allocate memory for the new root, make the old root a child of the new
+	  root, then split the old root array and move up the median. The height
+	  of the tree will increment. 
+		- Splitting is done by creating a new node with its own arrays.
+		  Once we have those, we copy the old keys and elements that need to
+		  become children of this new node and add them as children nodes.
+		  We must also decrement the currSize and of each node as we have removed
+		  one from the original. After that, we must relink everything properly.
+	- If the root node is not full, we find the child in the array which will
+	  hold the new key. If this child is a leaf, we can just find the right spot
+	  for it and insert it like normal. If it isn't a leaf, we must find the 
+	  correct child for that key, check if that child is full, if it is, split.
+	  We then see which of the split nodes will hold our new key.
+
+	- By doing all these checks for splitting and inserting keys, we are also
+	  adjusting the tree during these operations. At each step, we are looking
+	  out for full nodes and splitting if necessary. This will make sure the
+	  tree keeps the proper height, nodes, and structure throughout each operation.
+
+*more to be added as this project gets built; the above is an overview, not code*	 	

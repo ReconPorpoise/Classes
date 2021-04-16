@@ -6,9 +6,9 @@
 #include "album.h"
 using namespace std;
 
-int main() {
+int main(int argc, char** argv) {
 	Album album;
-	string fileName = "polyphia.txt";
+	string fileName = argv[1];
 	fstream infile(fileName.c_str(), ios::in);
 	
 	set<Album> list;

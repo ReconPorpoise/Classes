@@ -1,0 +1,8 @@
+Project 3: The B-Tree
+---------------------
+The goal of this project is to implement a B-Tree with the intention
+of storing, sorting, and accessing song album data from our Album class.
+
+To implement this, the file name must be taken in on the command line and be
+made sure of its validity. Then, Album objects must be taken in from the given
+file in the format of <UPC> <Artist> <Title> on their own lines.

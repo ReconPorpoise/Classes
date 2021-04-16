@@ -1,16 +1,22 @@
-#include <iostream>
 #include <cstring>
+#include <fstream>
+#include <iostream>
+#include <set>
 #include <string>
-#include "album.cpp"
+#include "album.h"
 using namespace std;
 
 int main() {
-	String upc = "12345";
-	String artist = "Polyphia";
-	String title = "New Levels New Devils";
-	Album test(upc, artist, title);
+	Album album;
+	string fileName = "polyphia.txt";
+	fstream infile(fileName.c_str(), ios::in);
+	
+	set<Album> list;
+	while(infile >> album)
+		list.insert(album);
 
-	cout << test << endl;
+	for(Album x : list)
+		cout << x << endl;
+
 	return 0;
-
 }

@@ -11,7 +11,7 @@ using the istream getline function while delimiting by '\n' and allocating
 operator to take in those 3 points.
 
 Next, we must tackle the B-Tree functions, specifically the insert, split, and
-adjust. This is typically all one operation, so it will be described as such:
+adjust. This is typically done simultaneously, so it will be described as such:
 	- First, we check if the tree is empty. If it is, we add a root node
 	  with its key and increase the currSize of that node. We then adjust our 
 	  arrays accordingly (adding into the ValueArray).
@@ -34,6 +34,9 @@ adjust. This is typically all one operation, so it will be described as such:
 	- By doing all these checks for splitting and inserting keys, we are also
 	  adjusting the tree during these operations. At each step, we are looking
 	  out for full nodes and splitting if necessary. This will make sure the
-	  tree keeps the proper height, nodes, and structure throughout each operation.
+	  tree keeps the proper height, nodes, and structure throughout each 
+	  operation. Also, by doing as much as we can per-insert, we shall minimize
+	  the number of seeks, reads, and writes to the external file, and work with 
+	  as much as we can in RAM.
 
-*more to be added as this project gets built; the above is an overview, not code*	 	
+*more to be added as the project progresses*

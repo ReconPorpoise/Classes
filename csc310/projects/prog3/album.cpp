@@ -23,7 +23,7 @@ Album & Album::operator = (const Album& otherAlbum) {
 }
 
 bool operator < (const Album& a, const Album& b) {
-	return a.UPC < b.UPC;
+	return stol(a.UPC) < stol(b.UPC);
 }
 
 istream & operator >> (istream & stream, Album & C) {

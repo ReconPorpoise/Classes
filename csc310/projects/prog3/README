@@ -9,6 +9,8 @@ file in the format of <UPC> <Artist> <Title> on their own lines. This is done
 using the istream getline function while delimiting by '\n' and allocating
 50 bits to each of those 3 items. This was implemented by overloading the >> 
 operator to take in those 3 points.
+Also, the < operator was overloaded for Album objects where Albums are compared
+via their UPC. The UPC was compared by casting them to longs. 
 
 Next, we must tackle the B-Tree functions, specifically the insert, split, and
 adjust. This is typically done simultaneously, so it will be described as such:

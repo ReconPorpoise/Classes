@@ -18,12 +18,12 @@ int main(int argc, char **argv)
 
     Album temp;
     while (infile >> temp)
-    {
-
         tree.insert(temp);
-    }
 
     tree.printTree();
+
+    //cout << boolalpha << tree.search("990-00-00") << endl;
+    //cout << boolalpha << tree.search("98") << endl;
 
     infile.close();
     tree.close();

@@ -12,7 +12,6 @@ BTree::BTree()
 // Public
 ////////////////////////////////////////////////////////////////////////////////
 
-// DONE
 // create the header of the file with the correct pointers
 // to the root address and initialize the arrays of root
 void BTree::writeHeader(char *fileName)
@@ -30,7 +29,6 @@ void BTree::writeHeader(char *fileName)
     root.currSize = 0;
 }
 
-// DONE
 // [public] inserts keys into the B-Tree
 void BTree::insert(keyType key)
 {
@@ -49,7 +47,6 @@ void BTree::insert(keyType key)
         insert(key, findAddr(key, root, rootAddr));
 }
 
-// DONE
 // clear the treeFile file
 void BTree::reset(char *fileName)
 {
@@ -60,14 +57,12 @@ void BTree::reset(char *fileName)
     treeFile.close();
 }
 
-// DONE
 // closes the treeFile file
 void BTree::close()
 {
     treeFile.close();
 }
 
-// DONE
 // prints the tree starting from the root address
 void BTree::printTree()
 {
@@ -85,7 +80,6 @@ void BTree::reverse()
     reverse(rootAddr);
 }
 
-// DONE
 // return the height
 int BTree::getHeight()
 {
@@ -94,19 +88,37 @@ int BTree::getHeight()
 
 bool BTree::search(string key)
 {
+    string wait;
+    cout << "I got a rootaddr: " << rootAddr << endl;
+    getline(cin, wait);
+    return search(key, root, rootAddr);
 }
 
 keyType BTree::retrieve(string key)
 {
+    return retrieve(key, root, rootAddr);
 }
 
 void BTree::totalio() const
 {
+    cout << "Read: " << read << endl;
+    cout << "Write: " << write << endl;
 }
 
 int BTree::countLeaves()
 {
-    countLeaves(rootAddr);
+    return countLeaves(rootAddr);
+}
+
+void BTree::defineRoot(char *fileName)
+{
+    treeFile.open(fileName, ios::in | ios::out | ios::binary);
+    BTNode temp;
+    treeFile.seekg(0, ios::beg);
+    treeFile.read((char *)&temp, sizeof(BTNode));
+    rootAddr = temp.child[0];
+    root = getNode(temp.child[0]);
+    read++;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -128,11 +140,11 @@ void BTree::printTree(int recAddr)
 // inorder traversal
 void BTree::inorder(int rootAddr)
 {
-    if (rootAddr = -1)
+    if (rootAddr == -1)
         return;
     BTNode tempNode = getNode(rootAddr);
-    int i = 0;
-    for (; i < tempNode.currSize; i++)
+    int i;
+    for (i = 0; i < tempNode.currSize; i++)
     {
         inorder(tempNode.child[i]);
         cout << tempNode.contents[i] << endl;
@@ -143,11 +155,11 @@ void BTree::inorder(int rootAddr)
 // reverse inorder traversal
 void BTree::reverse(int rootAddr)
 {
-    if (rootAddr = -1)
+    if (rootAddr == -1)
         return;
     BTNode tempNode = getNode(rootAddr);
-    int i = tempNode.currSize;
-    for (; i >= 0; i--)
+    int i;
+    for (i = tempNode.currSize; i >= 0; i--)
     {
         if (i < tempNode.currSize)
             cout << tempNode.contents[i] << endl;
@@ -307,13 +319,13 @@ bool BTree::isLeaf(BTNode t)
 // return the number of leaves in the B-Tree
 int BTree::countLeaves(int recAddr)
 {
-    BTNode tempNode = getNode(rootAddr);
+    BTNode tempNode = getNode(recAddr);
     if (isLeaf(tempNode))
         return 1;
     else
     {
         int leaves = 0;
-        for (int i = 0; i < tempNode.currSize; i++)
+        for (int i = 0; i <= tempNode.currSize; i++)
             leaves += countLeaves(tempNode.child[i]);
         return leaves;
     }
@@ -458,6 +470,40 @@ void BTree::splitNode(keyType &key, int recAddr, int rAddr)
     }
 }
 
+// use the same logic as findAddr but break when we find the key
 bool BTree::search(string key, BTNode t, int tAddr)
 {
+    cout << key << endl;
+    cout << tAddr << endl;
+
+    int i;
+    for (i = 0; i < t.currSize; i++)
+    {
+        if (key == t.contents[i].getUPC())
+            return true;
+        if (key < t.contents[i].getUPC())
+            return search(key, getNode(t.child[i]), t.child[i]);
+    }
+    // if the loop is at the last child...
+    if (isLeaf(t))
+        return false;
+    return search(key, getNode(t.child[i]), t.child[i]);
+}
+
+// same as search, but return the album not a bool
+keyType BTree::retrieve(string key, BTNode t, int tAddr)
+{
+    keyType vnf;
+    int i;
+    for (i = 0; i < t.currSize; i++)
+    {
+        if (key == t.contents[i].getUPC())
+            return t.contents[i];
+        if (key < t.contents[i].getUPC())
+            return retrieve(key, getNode(t.child[i]), t.child[i]);
+    }
+    // if the loop is at the last child...
+    if (isLeaf(t))
+        return vnf;
+    return retrieve(key, getNode(t.child[i]), t.child[i]);
 }

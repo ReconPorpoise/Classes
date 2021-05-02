@@ -51,6 +51,7 @@ public:
 	keyType retrieve(string key);
 	void totalio() const;
 	int countLeaves();
+	void defineRoot(char *fileName);
 
 private:
 	BTNode root;
@@ -76,6 +77,7 @@ private:
 	void adjRoot(keyType rootElem, int oneAddr, int twoAddr);
 	void splitNode(keyType &key, int recAddr, int rAddr);
 	bool search(string key, BTNode t, int tAddr);
+	keyType retrieve(string key, BTNode t, int tAddr);
 };
 
 #endif

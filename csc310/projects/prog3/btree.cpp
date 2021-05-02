@@ -158,7 +158,7 @@ int BTree::findpAddr(keyType key, BTNode t, int tAddr, int findAddr)
     // otherwise check for the key in each of the children
     for (int i = 0; i <= t.currSize; i++)
         if (t.child[i] == findAddr)
-            return findAddr;
+            return tAddr;
 
     // check contents for the key we need
     int i;
@@ -178,7 +178,6 @@ int BTree::findpAddr(keyType key, BTNode t, int tAddr, int findAddr)
 void BTree::insert(keyType key, int recAddr)
 {
     BTNode currNode = getNode(recAddr);
-
     // if we don't need splits
     if (currNode.currSize < ORDER - 1)
     {
@@ -198,9 +197,7 @@ void BTree::insert(keyType key, int recAddr)
     }
     else
     {
-        int newRecAddr;
-        int rAddr;
-        splitNode(key, recAddr, newRecAddr, rAddr);
+        splitNode(key, recAddr);
     }
 }
 
@@ -230,8 +227,52 @@ void BTree::printNode(int recAddr)
         cout << temp.contents[i] << endl;
 }
 
-void BTree::placeNode(keyType k, int recAddr, int oneAddr, int twoAddr)
+// actually promotes the median from a split
+void BTree::placeNode(keyType key, int pAddr, int leftAddr, int rightAddr)
 {
+    BTNode parentNode = getNode(pAddr);
+
+    // czech if node we are pushing to is not full
+    if (parentNode.currSize < ORDER - 1)
+    {
+        // sort the contents array but make sure to keep the children alligned as well if needed
+        if (parentNode.contents[parentNode.currSize - 1] > key)
+        {
+            int shift = 0;
+            while (key > parentNode.contents[shift] && shift < parentNode.currSize)
+                shift++;
+
+            int end = parentNode.currSize - 1;
+            while (end >= shift)
+            {
+                parentNode.contents[end + 1] = parentNode.contents[end];
+                parentNode.child[end + 2] = parentNode.child[end + 1];
+                end--;
+            }
+
+            parentNode.contents[shift] = key;
+            parentNode.child[shift + 1] = rightAddr;
+            parentNode.currSize++;
+        }
+        // if we don't need to rearrange, set the content/child accordingly at the end
+        else
+        {
+            parentNode.contents[parentNode.currSize++] = key;
+            parentNode.child[parentNode.currSize] = rightAddr;
+        }
+
+        // write the changes to the file
+        treeFile.seekp(pAddr);
+        treeFile.write((char *)&parentNode, sizeof(BTNode));
+        write++;
+
+        if (pAddr == rootAddr)
+            root = parentNode;
+    }
+    else
+    {
+        // TODO: Do chain splitting
+    }
 }
 
 // DONE
@@ -252,8 +293,11 @@ int BTree::countLeaves(int recAddr)
 {
 }
 
+// DONE
+// rewrites the root when a split occurs
 void BTree::adjRoot(keyType rootElem, int oneAddr, int twoAddr)
 {
+    // set the correct left/right children for the new root node then write it out to treeFile
     BTNode newRoot;
     newRoot.currSize = 1;
     newRoot.contents[0] = rootElem;
@@ -276,8 +320,9 @@ void BTree::adjRoot(keyType rootElem, int oneAddr, int twoAddr)
 }
 
 // splits the nodes when a node is filled
-void BTree::splitNode(keyType &key, int recAddr, int &oneAddr, int &twoAddr)
+void BTree::splitNode(keyType &key, int recAddr)
 {
+    cout << "Now Splitting" << endl;
     BTNode currNode = getNode(recAddr);
 
     // if the split is occurring at a leaf...
@@ -320,9 +365,12 @@ void BTree::splitNode(keyType &key, int recAddr, int &oneAddr, int &twoAddr)
         write += 2;
 
         // this checks if the root was split, if it was, run adjRoot to set the new root
+        // otherwise, push up the median to the parent node
         int parentAddr = findpAddr(key, root, rootAddr, recAddr);
         if (parentAddr == -1)
             adjRoot(currNode.contents[2], recAddr, rightAddr);
+        else
+            placeNode(currNode.contents[2], parentAddr, recAddr, rightAddr);
     }
 }
 

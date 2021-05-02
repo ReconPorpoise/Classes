@@ -34,12 +34,12 @@ Album &Album::operator=(const Album &otherAlbum)
 
 bool operator<(const Album &a, const Album &b)
 {
-	return stol(a.UPC) < stol(b.UPC);
+	return a.getUPC() < b.getUPC();
 }
 
 bool operator>(const Album &a, const Album &b)
 {
-	return stol(a.UPC) > stol(b.UPC);
+	return a.getUPC() > b.getUPC();
 }
 
 istream &operator>>(istream &stream, Album &C)
@@ -56,7 +56,7 @@ ostream &operator<<(ostream &stream, Album &C)
 	return stream;
 }
 
-string Album::getUPC()
+string Album::getUPC() const
 {
 	return UPC;
 }

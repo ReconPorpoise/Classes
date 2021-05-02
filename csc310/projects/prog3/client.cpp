@@ -12,19 +12,19 @@ int main(int argc, char **argv)
     fstream infile;
     infile.open(in, ios::in);
 
-    BTree cunt;
-    cunt.reset(out);
-    cunt.writeHeader(out);
+    BTree tree;
+    tree.reset(out);
+    tree.writeHeader(out);
 
     Album temp;
     while (infile >> temp)
     {
 
-        cunt.insert(temp);
+        tree.insert(temp);
     }
 
-    cunt.printTree();
+    tree.printTree();
 
     infile.close();
-    cunt.close();
+    tree.close();
 }

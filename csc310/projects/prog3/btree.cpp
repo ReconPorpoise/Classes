@@ -71,15 +71,18 @@ void BTree::close()
 // prints the tree starting from the root address
 void BTree::printTree()
 {
+    cout << "---- B-Tree of Height " << getHeight() << " ----" << endl;
     printTree(rootAddr);
 }
 
 void BTree::inorder()
 {
+    inorder(rootAddr);
 }
 
 void BTree::reverse()
 {
+    reverse(rootAddr);
 }
 
 // DONE
@@ -103,13 +106,13 @@ void BTree::totalio() const
 
 int BTree::countLeaves()
 {
+    countLeaves(rootAddr);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Private
 ////////////////////////////////////////////////////////////////////////////////
 
-// DONE
 // Dr. Digh's printTree
 void BTree::printTree(int recAddr)
 {
@@ -122,15 +125,36 @@ void BTree::printTree(int recAddr)
     }
 }
 
+// inorder traversal
 void BTree::inorder(int rootAddr)
 {
+    if (rootAddr = -1)
+        return;
+    BTNode tempNode = getNode(rootAddr);
+    int i = 0;
+    for (; i < tempNode.currSize; i++)
+    {
+        inorder(tempNode.child[i]);
+        cout << tempNode.contents[i] << endl;
+    }
+    inorder(tempNode.child[i]);
 }
 
+// reverse inorder traversal
 void BTree::reverse(int rootAddr)
 {
+    if (rootAddr = -1)
+        return;
+    BTNode tempNode = getNode(rootAddr);
+    int i = tempNode.currSize;
+    for (; i >= 0; i--)
+    {
+        if (i < tempNode.currSize)
+            cout << tempNode.contents[i] << endl;
+        reverse(tempNode.child[i]);
+    }
 }
 
-// DONE
 // find the address of the key
 // if it isn't in the tree, get the address of where it would be
 int BTree::findAddr(keyType key, BTNode t, int tAddr)
@@ -147,7 +171,6 @@ int BTree::findAddr(keyType key, BTNode t, int tAddr)
     return findAddr(key, getNode(t.child[i]), t.child[i]);
 }
 
-// DONE
 // find the address of the parent of the key we need to insert
 int BTree::findpAddr(keyType key, BTNode t, int tAddr, int findAddr)
 {
@@ -170,11 +193,7 @@ int BTree::findpAddr(keyType key, BTNode t, int tAddr, int findAddr)
     return findpAddr(key, getNode(t.child[i]), t.child[i], findAddr);
 }
 
-// TODO: Work cases for splits:
-// Split Root;
-//      we need to remake the header!
-// Split Internal Node/Leaf Node;
-// Chain Split aka Death;
+// insert nodes into the b-tree
 void BTree::insert(keyType key, int recAddr)
 {
     BTNode currNode = getNode(recAddr);
@@ -195,13 +214,14 @@ void BTree::insert(keyType key, int recAddr)
         if (recAddr == rootAddr)
             root = currNode;
     }
+    // splitting
     else
     {
-        splitNode(key, recAddr);
+        int ghostAddr;
+        splitNode(key, recAddr, ghostAddr);
     }
 }
 
-// DONE
 // seek in the tree to the node's address then read in the node data and return it
 BTNode BTree::getNode(int recAddr)
 {
@@ -213,7 +233,6 @@ BTNode BTree::getNode(int recAddr)
     return temp;
 }
 
-// DONE
 // Dr. Digh's printNode function
 void BTree::printNode(int recAddr)
 {
@@ -232,7 +251,7 @@ void BTree::placeNode(keyType key, int pAddr, int leftAddr, int rightAddr)
 {
     BTNode parentNode = getNode(pAddr);
 
-    // czech if node we are pushing to is not full
+    // check if node we are pushing to is not full
     if (parentNode.currSize < ORDER - 1)
     {
         // sort the contents array but make sure to keep the children alligned as well if needed
@@ -270,33 +289,41 @@ void BTree::placeNode(keyType key, int pAddr, int leftAddr, int rightAddr)
             root = parentNode;
     }
     else
-    {
-        // TODO: Do chain splitting
-    }
+        splitNode(key, pAddr, rightAddr);
 }
 
-// DONE
 // calls the private isLeaf function with the node associated with the address
 bool BTree::isLeaf(int recAddr)
 {
     return isLeaf(getNode(recAddr));
 }
 
-// DONE
 // return if the first child is a null link, therefore no links exist
 bool BTree::isLeaf(BTNode t)
 {
     return t.child[0] == -1;
 }
 
+// return the number of leaves in the B-Tree
 int BTree::countLeaves(int recAddr)
 {
+    BTNode tempNode = getNode(rootAddr);
+    if (isLeaf(tempNode))
+        return 1;
+    else
+    {
+        int leaves = 0;
+        for (int i = 0; i < tempNode.currSize; i++)
+            leaves += countLeaves(tempNode.child[i]);
+        return leaves;
+    }
 }
 
-// DONE
 // rewrites the root when a split occurs
 void BTree::adjRoot(keyType rootElem, int oneAddr, int twoAddr)
 {
+    height++;
+
     // set the correct left/right children for the new root node then write it out to treeFile
     BTNode newRoot;
     newRoot.currSize = 1;
@@ -320,7 +347,7 @@ void BTree::adjRoot(keyType rootElem, int oneAddr, int twoAddr)
 }
 
 // splits the nodes when a node is filled
-void BTree::splitNode(keyType &key, int recAddr)
+void BTree::splitNode(keyType &key, int recAddr, int rAddr)
 {
     cout << "Now Splitting" << endl;
     BTNode currNode = getNode(recAddr);
@@ -351,16 +378,13 @@ void BTree::splitNode(keyType &key, int recAddr)
 
         // set the links in the new nodes to -1 (null)
         for (int i = 0; i < ORDER; i++)
-        {
             right.child[i] = -1;
-            currNode.child[i] = -1;
-        }
 
         // write the left and right nodes to the file (left is just overwrite of curr)
         treeFile.seekp(recAddr);
         treeFile.write((char *)&currNode, sizeof(BTNode));
         treeFile.seekp(0, ios::end);
-        int rightAddr = treeFile.tellp();
+        rAddr = treeFile.tellp();
         treeFile.write((char *)&right, sizeof(BTNode));
         write += 2;
 
@@ -368,9 +392,69 @@ void BTree::splitNode(keyType &key, int recAddr)
         // otherwise, push up the median to the parent node
         int parentAddr = findpAddr(key, root, rootAddr, recAddr);
         if (parentAddr == -1)
-            adjRoot(currNode.contents[2], recAddr, rightAddr);
+            adjRoot(currNode.contents[2], recAddr, rAddr);
         else
-            placeNode(currNode.contents[2], parentAddr, recAddr, rightAddr);
+            placeNode(currNode.contents[2], parentAddr, recAddr, rAddr);
+    }
+    else
+    {
+        // chain split
+        if (currNode.contents[currNode.currSize - 1] > key)
+        {
+            keyType keyTemp = currNode.contents[currNode.currSize - 1];
+            int rAddrTemp = currNode.child[currNode.currSize];
+            currNode.currSize--;
+
+            int shift = 0;
+            while (key > currNode.contents[shift] && shift < currNode.currSize)
+                shift++;
+
+            int end = currNode.currSize - 1;
+            while (end >= shift)
+            {
+                currNode.contents[end + 1] = currNode.contents[end];
+                currNode.child[end + 2] = currNode.child[end + 1];
+                end--;
+            }
+
+            currNode.contents[shift] = key;
+            currNode.child[shift + 1] = rAddr;
+
+            key = keyTemp;
+            rAddr = rAddrTemp;
+        }
+
+        int parentAddr = findpAddr(key, root, rootAddr, recAddr);
+        currNode.currSize = 2;
+
+        // create the right node as we did above, creating the contents and children for it
+        BTNode right;
+        right.currSize = 2;
+        right.contents[0] = currNode.contents[3];
+        right.contents[1] = key;
+
+        right.child[0] = currNode.child[3];
+        right.child[1] = currNode.child[4];
+        right.child[2] = rAddr;
+
+        // initialize all children of the node to -1 (null)
+        for (int i = 3; i < ORDER; i++)
+            right.child[i] = -1;
+
+        // write out the adjustments to the treeFile
+        treeFile.seekp(recAddr);
+        treeFile.write((char *)&currNode, sizeof(BTNode));
+        treeFile.seekp(0, ios::end);
+        rAddr = treeFile.tellp();
+        treeFile.write((char *)&right, sizeof(BTNode));
+        write += 2;
+
+        // check if the root was split, if it was, run adjRoot to set the new root
+        // otherwise, push up the median to the parent node
+        if (parentAddr == -1)
+            adjRoot(currNode.contents[2], recAddr, rAddr);
+        else
+            placeNode(currNode.contents[2], parentAddr, recAddr, rAddr);
     }
 }
 

@@ -74,7 +74,7 @@ private:
 	bool isLeaf(BTNode t);
 	int countLeaves(int recAddr);
 	void adjRoot(keyType rootElem, int oneAddr, int twoAddr);
-	void splitNode(keyType &key, int recAddr);
+	void splitNode(keyType &key, int recAddr, int rAddr);
 	bool search(string key, BTNode t, int tAddr);
 };
 

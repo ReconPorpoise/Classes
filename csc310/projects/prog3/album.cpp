@@ -52,7 +52,7 @@ istream &operator>>(istream &stream, Album &C)
 
 ostream &operator<<(ostream &stream, Album &C)
 {
-	cout << C.UPC << " " << C.Artist << " " << C.Title;
+	cout << C.UPC << "|" << C.Artist << "|" << C.Title << "|";
 	return stream;
 }
 

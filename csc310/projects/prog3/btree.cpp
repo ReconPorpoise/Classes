@@ -88,9 +88,6 @@ int BTree::getHeight()
 
 bool BTree::search(string key)
 {
-    string wait;
-    cout << "I got a rootaddr: " << rootAddr << endl;
-    getline(cin, wait);
     return search(key, root, rootAddr);
 }
 
@@ -334,6 +331,7 @@ int BTree::countLeaves(int recAddr)
 // rewrites the root when a split occurs
 void BTree::adjRoot(keyType rootElem, int oneAddr, int twoAddr)
 {
+    cout << "Now Adjusting Root!" << endl;
     height++;
 
     // set the correct left/right children for the new root node then write it out to treeFile
@@ -361,7 +359,7 @@ void BTree::adjRoot(keyType rootElem, int oneAddr, int twoAddr)
 // splits the nodes when a node is filled
 void BTree::splitNode(keyType &key, int recAddr, int rAddr)
 {
-    cout << "Now Splitting" << endl;
+    cout << "Now Splitting!" << endl;
     BTNode currNode = getNode(recAddr);
 
     // if the split is occurring at a leaf...

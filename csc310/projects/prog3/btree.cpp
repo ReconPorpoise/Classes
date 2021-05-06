@@ -27,6 +27,7 @@ void BTree::writeHeader(char *fileName)
         root.child[i] = -1;
 
     root.currSize = 0;
+    write++;
 }
 
 // [public] inserts keys into the B-Tree
@@ -471,9 +472,6 @@ void BTree::splitNode(keyType &key, int recAddr, int rAddr)
 // use the same logic as findAddr but break when we find the key
 bool BTree::search(string key, BTNode t, int tAddr)
 {
-    cout << key << endl;
-    cout << tAddr << endl;
-
     int i;
     for (i = 0; i < t.currSize; i++)
     {

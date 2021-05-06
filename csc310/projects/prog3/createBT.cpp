@@ -22,8 +22,8 @@ int main(int argc, char **argv)
 
     tree.printTree();
 
-    //cout << boolalpha << tree.search("990-00-00") << endl;
-    //cout << boolalpha << tree.search("98") << endl;
+    // cout << boolalpha << tree.search("42276") << endl;
+    // cout << boolalpha << tree.search("1234123") << endl;
 
     infile.close();
     tree.close();

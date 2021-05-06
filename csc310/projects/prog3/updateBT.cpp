@@ -24,18 +24,17 @@ int main(int argc, char **argv)
         {
             string toFind;
             getline(transactions, toFind);
-            cout << toFind << endl;
             bool ifFound = tree.search(toFind);
             if (ifFound)
-                cout << toFind << " was found." << endl;
+                cout << "\t" << toFind << endl;
             else
-                cout << toFind << " was not found." << endl;
+                cout << "\t"
+                     << "\"" << toFind << "\" not found" << endl;
         }
         if (instr == 'I')
         {
             transactions >> tempRecord;
             tree.insert(tempRecord);
-            cout << tempRecord << " was inserted." << endl;
         }
     }
 

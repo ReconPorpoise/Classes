@@ -472,15 +472,11 @@ void BTree::splitNode(keyType &key, int recAddr, int rAddr)
 // use the same logic as findAddr but break when we find the key
 bool BTree::search(string key, BTNode t, int tAddr)
 {
-    int i;
-    for (i = 0; i < t.currSize; i++)
-    {
-        if (key == t.contents[i].getUPC())
-            return true;
-        if (key < t.contents[i].getUPC())
-            return search(key, getNode(t.child[i]), t.child[i]);
-    }
-    // if the loop is at the last child...
+    int i = 0;
+    while (i < t.currSize && strcmp(key.c_str(), t.contents[i].getUPC().c_str()) > 0)
+        i++;
+    if (strcmp(t.contents[i].getUPC().c_str(), key.c_str()) == 0)
+        return true;
     if (isLeaf(t))
         return false;
     return search(key, getNode(t.child[i]), t.child[i]);

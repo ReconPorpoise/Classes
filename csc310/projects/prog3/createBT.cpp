@@ -22,14 +22,6 @@ int main(int argc, char **argv)
 
     tree.printTree();
 
-    // cout << boolalpha << tree.search("42276") << endl;
-    // cout << boolalpha << tree.search("1234123") << endl;
-    // cout << boolalpha << tree.search("20831-4207-2") << endl;
-    // cout << boolalpha << tree.search("7559-61257-2") << endl;
-    // cout << boolalpha << tree.search("08811-134120") << endl;
-    // cout << boolalpha << tree.search("non-existing") << endl;
-
-    tree.totalio();
     infile.close();
     tree.close();
 }

@@ -41,7 +41,6 @@ void BTree::insert(keyType key)
         root.currSize++;
         treeFile.seekp(rootAddr);
         treeFile.write((char *)&root, sizeof(BTNode));
-        cout << "Write Increment (root empty)" << endl;
         write++;
     }
     else
@@ -99,8 +98,8 @@ keyType BTree::retrieve(string key)
 
 void BTree::totalio() const
 {
-    cout << "Read: " << read << endl;
-    cout << "Write: " << write << endl;
+    cout << "\tTotal Reads = " << read << endl;
+    cout << "\tTotal Writes = " << write << endl;
 }
 
 int BTree::countLeaves()
@@ -117,7 +116,6 @@ void BTree::defineRoot(char *fileName)
     rootAddr = temp.child[0];
     root = getNode(temp.child[0]);
     read++;
-    cout << "READ INCREMENTED" << endl;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -221,7 +219,6 @@ void BTree::insert(keyType key, int recAddr)
         treeFile.write((char *)&currNode, sizeof(BTNode));
         write++;
 
-        cout << "WRITE INCREMENTED" << endl;
         // keep everything in relation to root
         if (recAddr == rootAddr)
             root = currNode;
@@ -241,7 +238,6 @@ BTNode BTree::getNode(int recAddr)
     BTNode temp;
     treeFile.read((char *)&temp, sizeof(BTNode));
     read++;
-    cout << "READ INCREMENTED" << endl;
 
     return temp;
 }
@@ -253,7 +249,6 @@ void BTree::printNode(int recAddr)
     BTNode temp;
     treeFile.read((char *)&temp, sizeof(BTNode));
     read++;
-    cout << "READ INCREMENTED" << endl;
 
     cout << "    *** node of size " << temp.currSize << " ***    " << endl;
     for (int i = 0; i < temp.currSize; i++)
@@ -298,7 +293,6 @@ void BTree::placeNode(keyType key, int pAddr, int leftAddr, int rightAddr)
         treeFile.seekp(pAddr);
         treeFile.write((char *)&parentNode, sizeof(BTNode));
         write++;
-        cout << "WRITE INCREMENTED" << endl;
 
         if (pAddr == rootAddr)
             root = parentNode;
@@ -360,8 +354,6 @@ void BTree::adjRoot(keyType rootElem, int oneAddr, int twoAddr)
     treeFile.seekp(0, ios::beg);
     treeFile.write((char *)&temp, sizeof(BTNode));
     write++;
-
-    cout << "WRITE INCREMENTED TWICE" << endl;
 }
 
 // splits the nodes when a node is filled
@@ -406,7 +398,6 @@ void BTree::splitNode(keyType &key, int recAddr, int rAddr)
         treeFile.write((char *)&right, sizeof(BTNode));
         write += 2;
 
-        cout << "WRITE INCREMENTED TWICE" << endl;
         // this checks if the root was split, if it was, run adjRoot to set the new root
         // otherwise, push up the median to the parent node
         int parentAddr = findpAddr(key, root, rootAddr, recAddr);
@@ -467,8 +458,6 @@ void BTree::splitNode(keyType &key, int recAddr, int rAddr)
         rAddr = treeFile.tellp();
         treeFile.write((char *)&right, sizeof(BTNode));
         write += 2;
-
-        cout << "WRITE INCREMENTED TWICE" << endl;
 
         // check if the root was split, if it was, run adjRoot to set the new root
         // otherwise, push up the median to the parent node

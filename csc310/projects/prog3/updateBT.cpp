@@ -26,7 +26,10 @@ int main(int argc, char **argv)
             getline(transactions, toFind);
             bool ifFound = tree.search(toFind);
             if (ifFound)
-                cout << "\t" << toFind << endl;
+            {
+                Album toPrint = tree.retrieve(toFind);
+                cout << "\t" << toPrint << endl;
+            }
             else
                 cout << "\t"
                      << "\"" << toFind << "\" not found" << endl;
@@ -38,6 +41,7 @@ int main(int argc, char **argv)
         }
     }
 
+    cout << endl;
     tree.totalio();
     transactions.close();
     tree.close();

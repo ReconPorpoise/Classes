@@ -1,0 +1,869 @@
+Script started on Sat 08 May 2021 09:08:55 PM EDT
+]0;karamuca_ra@cobra:~/classes/csc310/projects/prog3[?1034h[karamuca_ra@cobra prog3]$ cat btree.h
+#include <algorithm>
+#include <vector>
+#include <set>
+#include <iostream>
+#include <cstring>
+#include <string>
+#include <cstdlib>
+#include "album.h"
+using namespace std;
+
+#ifndef BTREE_H
+#define BTREE_H
+
+class Album;
+const int ORDER = 5;
+typedef Album keyType;
+typedef int IndexArray[ORDER];
+typedef keyType ValueArray[ORDER - 1];
+
+struct BTNode
+{
+	int currSize;
+	ValueArray contents;
+	IndexArray child;
+};
+
+struct Pair
+{
+	Album element;
+	int loffset;
+	int roffset;
+	friend bool operator<(const Pair &p1, const Pair &p2)
+	{
+		return (p1.element < p2.element);
+	}
+};
+
+class BTree
+{
+public:
+	BTree();
+	void writeHeader(char *fileName);
+	void insert(keyType key);
+	void reset(char *filename);
+	void close();
+	void printTree();
+	void inorder();
+	void reverse();
+	int getHeight();
+	bool search(string key);
+	keyType retrieve(string key);
+	void totalio() const;
+	int countLeaves();
+	void defineRoot(char *fileName);
+
+private:
+	BTNode root;
+	int rootAddr;
+	char treeFileName[80];
+	fstream treeFile;
+	int height;
+	void printTree(int rootAddr);
+	void inorder(int rootAddr);
+	void reverse(int rootAddr);
+	int read;
+	int write;
+
+	int findAddr(keyType key, BTNode t, int tAddr);
+	int findpAddr(keyType key, BTNode t, int tAddr, int findAddr);
+	void insert(keyType key, int recAddr);
+	BTNode getNode(int recAddr);
+	void printNode(int recAddr);
+	void placeNode(keyType key, int pAddr, int leftAddr, int rightAddr);
+	bool isLeaf(int recAddr);
+	bool isLeaf(BTNode t);
+	int countLeaves(int recAddr);
+	void adjRoot(keyType rootElem, int oneAddr, int twoAddr);
+	void splitNode(keyType &key, int recAddr, int rAddr);
+	bool search(string key, BTNode t, int tAddr);
+	keyType retrieve(string key, BTNode t, int tAddr);
+};
+
+#endif
+]0;karamuca_ra@cobra:~/classes/csc310/projects/prog3[karamuca_ra@cobra prog3]$ cat btree.h[Kcpp
+#include "btree.h"
+
+BTree::BTree()
+{
+    rootAddr = -1;
+    height = 0;
+    read = 0;
+    write = 0;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Public
+////////////////////////////////////////////////////////////////////////////////
+
+// create the header of the file with the correct pointers
+// to the root address and initialize the arrays of root
+void BTree::writeHeader(char *fileName)
+{
+    BTNode temp;
+    temp.child[0] = sizeof(BTNode);
+
+    treeFile.open(fileName, ios::in | ios::out | ios::binary);
+    treeFile.write((char *)&temp, sizeof(BTNode));
+
+    rootAddr = sizeof(BTNode);
+    for (int i = 0; i < ORDER; i++)
+        root.child[i] = -1;
+
+    root.currSize = 0;
+}
+
+// [public] inserts keys into the B-Tree
+void BTree::insert(keyType key)
+{
+    cout << "Now Inserting " << key << endl;
+
+    // if the root is empty, we can just shove in the key
+    if (root.currSize == 0)
+    {
+        root.contents[0] = key;
+        root.currSize++;
+        treeFile.seekp(rootAddr);
+        treeFile.write((char *)&root, sizeof(BTNode));
+        write++;
+    }
+    else
+        insert(key, findAddr(key, root, rootAddr));
+}
+
+// clear the treeFile file
+void BTree::reset(char *fileName)
+{
+    if (treeFile)
+        treeFile.close();
+
+    treeFile.open(fileName, ios::out | ios::trunc);
+    treeFile.close();
+}
+
+// closes the treeFile file
+void BTree::close()
+{
+    treeFile.close();
+}
+
+// prints the tree starting from the root address
+void BTree::printTree()
+{
+    cout << "---- B-Tree of Height " << getHeight() << " ----" << endl;
+    printTree(rootAddr);
+}
+
+void BTree::inorder()
+{
+    inorder(rootAddr);
+}
+
+void BTree::reverse()
+{
+    reverse(rootAddr);
+}
+
+// return the height
+int BTree::getHeight()
+{
+    return height;
+}
+
+bool BTree::search(string key)
+{
+    return search(key, root, rootAddr);
+}
+
+keyType BTree::retrieve(string key)
+{
+    return retrieve(key, root, rootAddr);
+}
+
+void BTree::totalio() const
+{
+    cout << "\tTotal Reads = " << read << endl;
+    cout << "\tTotal Writes = " << write << endl;
+}
+
+int BTree::countLeaves()
+{
+    return countLeaves(rootAddr);
+}
+
+void BTree::defineRoot(char *fileName)
+{
+    treeFile.open(fileName, ios::in | ios::out | ios::binary);
+    BTNode temp;
+    treeFile.seekg(0, ios::beg);
+    treeFile.read((char *)&temp, sizeof(BTNode));
+    rootAddr = temp.child[0];
+    root = getNode(temp.child[0]);
+    read++;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Private
+////////////////////////////////////////////////////////////////////////////////
+
+// Dr. Digh's printTree
+void BTree::printTree(int recAddr)
+{
+    if (recAddr != -1)
+    {
+        BTNode temp = getNode(recAddr);
+        printNode(recAddr);
+        for (int i = 0; i <= temp.currSize; i++)
+            printTree(temp.child[i]);
+    }
+}
+
+// inorder traversal
+void BTree::inorder(int rootAddr)
+{
+    if (rootAddr == -1)
+        return;
+    BTNode tempNode = getNode(rootAddr);
+    int i;
+    for (i = 0; i < tempNode.currSize; i++)
+    {
+        inorder(tempNode.child[i]);
+        cout << tempNode.contents[i] << endl;
+    }
+    inorder(tempNode.child[i]);
+}
+
+// reverse inorder traversal
+void BTree::reverse(int rootAddr)
+{
+    if (rootAddr == -1)
+        return;
+    BTNode tempNode = getNode(rootAddr);
+    int i;
+    for (i = tempNode.currSize; i >= 0; i--)
+    {
+        if (i < tempNode.currSize)
+            cout << tempNode.contents[i] << endl;
+        reverse(tempNode.child[i]);
+    }
+}
+
+// find the address of the key
+// if it isn't in the tree, get the address of where it would be
+int BTree::findAddr(keyType key, BTNode t, int tAddr)
+{
+    if (isLeaf(t))
+        return tAddr;
+
+    int i;
+    for (i = 0; i < t.currSize; i++)
+        if (key < t.contents[i])
+            return findAddr(key, getNode(t.child[i]), t.child[i]);
+
+    // if the loop is at the last child...
+    return findAddr(key, getNode(t.child[i]), t.child[i]);
+}
+
+// find the address of the parent of the key we need to insert
+int BTree::findpAddr(keyType key, BTNode t, int tAddr, int findAddr)
+{
+    // if we are trying to find the parent of root (non-existent) return -1
+    if (findAddr == rootAddr)
+        return -1;
+
+    // otherwise check for the key in each of the children
+    for (int i = 0; i <= t.currSize; i++)
+        if (t.child[i] == findAddr)
+            return tAddr;
+
+    // check contents for the key we need
+    int i;
+    for (i = 0; i < t.currSize; i++)
+        if (key < t.contents[i])
+            return findpAddr(key, getNode(t.child[i]), t.child[i], findAddr);
+
+    // if the loop is at the last child...
+    return findpAddr(key, getNode(t.child[i]), t.child[i], findAddr);
+}
+
+// insert nodes into the b-tree
+void BTree::insert(keyType key, int recAddr)
+{
+    BTNode currNode = getNode(recAddr);
+    // if we don't need splits
+    if (currNode.currSize < ORDER - 1)
+    {
+        // add the key to that node and sort
+        currNode.contents[currNode.currSize] = key;
+        currNode.currSize++;
+        sort(currNode.contents, currNode.contents + currNode.currSize);
+
+        // write it out to the file and increment write operations
+        treeFile.seekp(recAddr);
+        treeFile.write((char *)&currNode, sizeof(BTNode));
+        write++;
+
+        // keep everything in relation to root
+        if (recAddr == rootAddr)
+            root = currNode;
+    }
+    // splitting
+    else
+    {
+        int ghostAddr;
+        splitNode(key, recAddr, ghostAddr);
+    }
+}
+
+// seek in the tree to the node's address then read in the node data and return it
+BTNode BTree::getNode(int recAddr)
+{
+    treeFile.seekg(recAddr);
+    BTNode temp;
+    treeFile.read((char *)&temp, sizeof(BTNode));
+    read++;
+
+    return temp;
+}
+
+// Dr. Digh's printNode function
+void BTree::printNode(int recAddr)
+{
+    treeFile.seekg(recAddr, ios::beg);
+    BTNode temp;
+    treeFile.read((char *)&temp, sizeof(BTNode));
+    read++;
+
+    cout << "    *** node of size " << temp.currSize << " ***    " << endl;
+    for (int i = 0; i < temp.currSize; i++)
+        cout << temp.contents[i] << endl;
+}
+
+// actually promotes the median from a split
+void BTree::placeNode(keyType key, int pAddr, int leftAddr, int rightAddr)
+{
+    BTNode parentNode = getNode(pAddr);
+
+    // check if node we are pushing to is not full
+    if (parentNode.currSize < ORDER - 1)
+    {
+        // sort the contents array but make sure to keep the children alligned as well if needed
+        if (parentNode.contents[parentNode.currSize - 1] > key)
+        {
+            int shift = 0;
+            while (key > parentNode.contents[shift] && shift < parentNode.currSize)
+                shift++;
+
+            int end = parentNode.currSize - 1;
+            while (end >= shift)
+            {
+                parentNode.contents[end + 1] = parentNode.contents[end];
+                parentNode.child[end + 2] = parentNode.child[end + 1];
+                end--;
+            }
+
+            parentNode.contents[shift] = key;
+            parentNode.child[shift + 1] = rightAddr;
+            parentNode.currSize++;
+        }
+        // if we don't need to rearrange, set the content/child accordingly at the end
+        else
+        {
+            parentNode.contents[parentNode.currSize++] = key;
+            parentNode.child[parentNode.currSize] = rightAddr;
+        }
+
+        // write the changes to the file
+        treeFile.seekp(pAddr);
+        treeFile.write((char *)&parentNode, sizeof(BTNode));
+        write++;
+
+        if (pAddr == rootAddr)
+            root = parentNode;
+    }
+    else
+        splitNode(key, pAddr, rightAddr);
+}
+
+// calls the private isLeaf function with the node associated with the address
+bool BTree::isLeaf(int recAddr)
+{
+    return isLeaf(getNode(recAddr));
+}
+
+// return if the first child is a null link, therefore no links exist
+bool BTree::isLeaf(BTNode t)
+{
+    return t.child[0] == -1;
+}
+
+// return the number of leaves in the B-Tree
+int BTree::countLeaves(int recAddr)
+{
+    BTNode tempNode = getNode(recAddr);
+    if (isLeaf(tempNode))
+        return 1;
+    else
+    {
+        int leaves = 0;
+        for (int i = 0; i <= tempNode.currSize; i++)
+            leaves += countLeaves(tempNode.child[i]);
+        return leaves;
+    }
+}
+
+// rewrites the root when a split occurs
+void BTree::adjRoot(keyType rootElem, int oneAddr, int twoAddr)
+{
+    cout << "Now Adjusting Root!" << endl;
+    height++;
+
+    // set the correct left/right children for the new root node then write it out to treeFile
+    BTNode newRoot;
+    newRoot.currSize = 1;
+    newRoot.contents[0] = rootElem;
+    newRoot.child[0] = oneAddr;
+    newRoot.child[1] = twoAddr;
+    for (int i = 2; i < ORDER; i++)
+        newRoot.child[i] = -1;
+
+    treeFile.seekp(0, ios::end);
+    rootAddr = treeFile.tellp();
+    root = newRoot;
+    treeFile.write((char *)&newRoot, sizeof(BTNode));
+    write++;
+
+    BTNode temp;
+    temp.child[0] = rootAddr;
+    treeFile.seekp(0, ios::beg);
+    treeFile.write((char *)&temp, sizeof(BTNode));
+    write++;
+}
+
+// splits the nodes when a node is filled
+void BTree::splitNode(keyType &key, int recAddr, int rAddr)
+{
+    cout << "Now Splitting!" << endl;
+    BTNode currNode = getNode(recAddr);
+
+    // if the split is occurring at a leaf...
+    if (isLeaf(currNode))
+    {
+        BTNode right;
+
+        if (currNode.contents[currNode.currSize - 1] > key)
+        {
+            keyType temp;
+            temp = currNode.contents[currNode.currSize - 1];
+            currNode.contents[currNode.currSize - 1] = key;
+            key = temp;
+
+            sort(currNode.contents, currNode.contents + currNode.currSize);
+        }
+
+        // hides the extra right-node stuff
+        // currNode becomes the left node
+        currNode.currSize = 2;
+
+        // only fill this node with the 2 nodes to the right of the split median
+        right.currSize = 2;
+        right.contents[0] = currNode.contents[3];
+        right.contents[1] = key;
+
+        // set the links in the new nodes to -1 (null)
+        for (int i = 0; i < ORDER; i++)
+            right.child[i] = -1;
+
+        // write the left and right nodes to the file (left is just overwrite of curr)
+        treeFile.seekp(recAddr);
+        treeFile.write((char *)&currNode, sizeof(BTNode));
+        treeFile.seekp(0, ios::end);
+        rAddr = treeFile.tellp();
+        treeFile.write((char *)&right, sizeof(BTNode));
+        write += 2;
+
+        // this checks if the root was split, if it was, run adjRoot to set the new root
+        // otherwise, push up the median to the parent node
+        int parentAddr = findpAddr(key, root, rootAddr, recAddr);
+        if (parentAddr == -1)
+            adjRoot(currNode.contents[2], recAddr, rAddr);
+        else
+            placeNode(currNode.contents[2], parentAddr, recAddr, rAddr);
+    }
+    else
+    {
+        // chain split
+        if (currNode.contents[currNode.currSize - 1] > key)
+        {
+            keyType keyTemp = currNode.contents[currNode.currSize - 1];
+            int rAddrTemp = currNode.child[currNode.currSize];
+            currNode.currSize--;
+
+            int shift = 0;
+            while (key > currNode.contents[shift] && shift < currNode.currSize)
+                shift++;
+
+            int end = currNode.currSize - 1;
+            while (end >= shift)
+            {
+                currNode.contents[end + 1] = currNode.contents[end];
+                currNode.child[end + 2] = currNode.child[end + 1];
+                end--;
+            }
+
+            currNode.contents[shift] = key;
+            currNode.child[shift + 1] = rAddr;
+
+            key = keyTemp;
+            rAddr = rAddrTemp;
+        }
+
+        int parentAddr = findpAddr(key, root, rootAddr, recAddr);
+        currNode.currSize = 2;
+
+        // create the right node as we did above, creating the contents and children for it
+        BTNode right;
+        right.currSize = 2;
+        right.contents[0] = currNode.contents[3];
+        right.contents[1] = key;
+
+        right.child[0] = currNode.child[3];
+        right.child[1] = currNode.child[4];
+        right.child[2] = rAddr;
+
+        // initialize all children of the node to -1 (null)
+        for (int i = 3; i < ORDER; i++)
+            right.child[i] = -1;
+
+        // write out the adjustments to the treeFile
+        treeFile.seekp(recAddr);
+        treeFile.write((char *)&currNode, sizeof(BTNode));
+        treeFile.seekp(0, ios::end);
+        rAddr = treeFile.tellp();
+        treeFile.write((char *)&right, sizeof(BTNode));
+        write += 2;
+
+        // check if the root was split, if it was, run adjRoot to set the new root
+        // otherwise, push up the median to the parent node
+        if (parentAddr == -1)
+            adjRoot(currNode.contents[2], recAddr, rAddr);
+        else
+            placeNode(currNode.contents[2], parentAddr, recAddr, rAddr);
+    }
+}
+
+// use the same logic as findAddr but break when we find the key
+bool BTree::search(string key, BTNode t, int tAddr)
+{
+    int i = 0;
+    while (i < t.currSize && strcmp(key.c_str(), t.contents[i].getUPC().c_str()) > 0)
+        i++;
+    if (strcmp(t.contents[i].getUPC().c_str(), key.c_str()) == 0)
+        return true;
+    if (isLeaf(t))
+        return false;
+    return search(key, getNode(t.child[i]), t.child[i]);
+}
+
+// same as search, but return the album not a bool
+keyType BTree::retrieve(string key, BTNode t, int tAddr)
+{
+    keyType vnf;
+    int i;
+    for (i = 0; i < t.currSize; i++)
+    {
+        if (key == t.contents[i].getUPC())
+            return t.contents[i];
+        if (key < t.contents[i].getUPC())
+            return retrieve(key, getNode(t.child[i]), t.child[i]);
+    }
+    // if the loop is at the last child...
+    if (isLeaf(t))
+        return vnf;
+    return retrieve(key, getNode(t.child[i]), t.child[i]);
+}]0;karamuca_ra@cobra:~/classes/csc310/projects/prog3[karamuca_ra@cobra prog3]$ cat createBT.cpp 
+#include <fstream>
+#include <iostream>
+#include "album.h"
+#include "btree.h"
+using namespace std;
+
+bool argCheck(char *inFile, char *treeFile);
+void printError();
+
+int main(int argc, char **argv)
+{
+    if (argc != 3)
+    {
+        printError();
+        return 1;
+    }
+
+    char *in = argv[1];
+    char *out = argv[2];
+
+    if (!argCheck(in, out))
+    {
+        return 1;
+    }
+
+    fstream infile;
+    infile.open(in, ios::in);
+
+    BTree tree;
+    tree.reset(out);
+    tree.writeHeader(out);
+
+    Album temp;
+    while (infile >> temp)
+        tree.insert(temp);
+
+    tree.printTree();
+
+    infile.close();
+    tree.close();
+}
+
+bool argCheck(char *inFile, char *treeFile)
+{
+    fstream testIn(inFile);
+    fstream testTree(treeFile);
+
+    // check if the tree file is valid
+    if (!(testIn.is_open()))
+    {
+        testIn.close();
+        testTree.close();
+
+        cout << "myCreate: Incorrect album file: " << inFile << " does not exist." << endl;
+        printError();
+        return false;
+    }
+    testIn.close();
+
+    // check if the transaction file is valid
+    if (!(testTree.is_open()))
+    {
+        testIn.close();
+        testTree.close();
+
+        cout << "myCreate: Incorrect tree file: " << treeFile << " does not exist." << endl;
+        printError();
+        return false;
+    }
+    testTree.close();
+
+    return true;
+}
+
+void printError()
+{
+    cout << "myCreate: Must have 2 files in the format of ./myCreate <album.ext file> <tree.ind file>." << endl;
+}]0;karamuca_ra@cobra:~/classes/csc310/projects/prog3[karamuca_ra@cobra prog3]$ cat createBT.cpp [1P[1P[1P[1P[1P[1P[1P[1@ [1@u[1@p[1@d[1@a[1@t[1@e
+#include <fstream>
+#include <iostream>
+#include "album.h"
+#include "btree.h"
+using namespace std;
+
+bool argCheck(char *infile, char *transFile);
+void printError();
+
+int main(int argc, char **argv)
+{
+    if (argc != 3)
+    {
+        printError();
+        return 1;
+    }
+
+    char *inTree = argv[1];
+    char *trans = argv[2];
+
+    if (!argCheck(inTree, trans))
+    {
+        return 1;
+    }
+
+    BTree tree;
+    Album tempRecord;
+
+    fstream transactions;
+    transactions.open(trans, ios::in);
+    tree.defineRoot(inTree);
+
+    char instr;
+    while (transactions >> instr)
+    {
+        transactions.ignore(1, '\n');
+        if (instr == 'S')
+        {
+            string toFind;
+            getline(transactions, toFind);
+            bool ifFound = tree.search(toFind);
+            if (ifFound)
+            {
+                Album toPrint = tree.retrieve(toFind);
+                cout << "\t" << toPrint << endl;
+            }
+            else
+                cout << "\t"
+                     << "\"" << toFind << "\" not found" << endl;
+        }
+        if (instr == 'I')
+        {
+            transactions >> tempRecord;
+            tree.insert(tempRecord);
+        }
+    }
+
+    cout << endl;
+    tree.totalio();
+    transactions.close();
+    tree.close();
+}
+
+bool argCheck(char *infile, char *transFile)
+{
+    fstream testIn(infile);
+    fstream testTrans(transFile);
+
+    // check if the tree file is valid
+    if (!(testIn.is_open()))
+    {
+        testIn.close();
+        testTrans.close();
+
+        cout << "myUpdate: Incorrect tree file: " << infile << " does not exist." << endl;
+        printError();
+        return false;
+    }
+    testIn.close();
+
+    // check if the transaction file is valid
+    if (!(testTrans.is_open()))
+    {
+        testIn.close();
+        testTrans.close();
+
+        cout << "myUpdate: Incorrect transaction file: " << transFile << " does not exist." << endl;
+        printError();
+        return false;
+    }
+    testTrans.close();
+
+    return true;
+}
+
+void printError()
+{
+    cout << "myUpdate: Must have 2 files in the format of ./myUpdate <tree.ind file> <transaction.dat file>." << endl;
+}
+]0;karamuca_ra@cobra:~/classes/csc310/projects/prog3[karamuca_ra@cobra prog3]$ cat updateBT.cpp [K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[Kmake calea[K[K[K[Klean
+rm -f *.o
+]0;karamuca_ra@cobra:~/classes/csc310/projects/prog3[karamuca_ra@cobra prog3]$ make 
+c++ -c btree.cpp
+c++ -c album.cpp
+c++ -o myCreate createBT.cpp btree.o album.o
+c++ -o myUpdate updateBT.cpp btree.o album.o
+]0;karamuca_ra@cobra:~/classes/csc310/projects/prog3[karamuca_ra@cobra prog3]$ ./myCreate album.la[K[Ksma[K[K[Krand[K[K[K[Kmed tree.ind[K
+myCreate: Incorrect tree file: tree.in does not exist.
+myCreate: Must have 2 files in the format of ./myCreate <album.ext file> <tree.ind file>.
+]0;karamuca_ra@cobra:~/classes/csc310/projects/prog3[karamuca_ra@cobra prog3]$ ./myCreate album.med tree.ind
+Now Inserting 08722|Counting Crows|This Desert Life|
+Now Inserting 75599|U2|All That You Can't Leave Behind|
+Now Inserting 42276|Tom Petty|Into the Great Wide Open|
+Now Inserting 02284|Kenny Loggins|Footloose|
+Now Inserting 20831|Dave Matthews|Everyday|
+Now Splitting!
+Now Adjusting Root!
+Now Inserting 99000|Train|Drops of Jupiter|
+Now Inserting 00100|Dido|No Angel|
+Now Inserting 00101|Eva Cassidy|Songbird|
+Now Inserting 00102|Metallica|Ride the Lightning|
+Now Splitting!
+Now Inserting 00000|Any Song|Any Artist|
+Now Inserting 00001|Any Song|Any Artist|
+Now Inserting 00002|Any Song|Any Artist|
+Now Splitting!
+Now Inserting 00003|Any Song|Any Artist|
+Now Inserting 00004|Any Song|Any Artist|
+Now Inserting 00005|Any Song|Any Artist|
+Now Splitting!
+Now Inserting 99999|Any Song|Any Artist|
+Now Inserting 99998|Any Song|Any Artist|
+Now Splitting!
+Now Splitting!
+Now Adjusting Root!
+Now Inserting 00006|Any Song|Any Artist|
+Now Inserting 00007|Any Song|Any Artist|
+Now Inserting 00008|Any Song|Any Artist|
+Now Splitting!
+Now Inserting 00009|Any Song|Any Artist|
+Now Inserting 00010|Any Song|Any Artist|
+Now Inserting 00011|Any Song|Any Artist|
+Now Splitting!
+Now Inserting 00012|Any Song|Any Artist|
+Now Inserting 00013|Any Song|Any Artist|
+Now Inserting 00014|Any Song|Any Artist|
+Now Splitting!
+Now Splitting!
+---- B-Tree of Height 2 ----
+    *** node of size 2 ***    
+00008|Any Song|Any Artist|
+00102|Metallica|Ride the Lightning|
+    *** node of size 2 ***    
+00002|Any Song|Any Artist|
+00005|Any Song|Any Artist|
+    *** node of size 2 ***    
+00000|Any Song|Any Artist|
+00001|Any Song|Any Artist|
+    *** node of size 2 ***    
+00003|Any Song|Any Artist|
+00004|Any Song|Any Artist|
+    *** node of size 2 ***    
+00006|Any Song|Any Artist|
+00007|Any Song|Any Artist|
+    *** node of size 2 ***    
+00011|Any Song|Any Artist|
+00014|Any Song|Any Artist|
+    *** node of size 2 ***    
+00009|Any Song|Any Artist|
+00010|Any Song|Any Artist|
+    *** node of size 2 ***    
+00012|Any Song|Any Artist|
+00013|Any Song|Any Artist|
+    *** node of size 2 ***    
+00100|Dido|No Angel|
+00101|Eva Cassidy|Songbird|
+    *** node of size 2 ***    
+20831|Dave Matthews|Everyday|
+99000|Train|Drops of Jupiter|
+    *** node of size 2 ***    
+02284|Kenny Loggins|Footloose|
+08722|Counting Crows|This Desert Life|
+    *** node of size 2 ***    
+42276|Tom Petty|Into the Great Wide Open|
+75599|U2|All That You Can't Leave Behind|
+    *** node of size 2 ***    
+99998|Any Song|Any Artist|
+99999|Any Song|Any Artist|
+]0;karamuca_ra@cobra:~/classes/csc310/projects/prog3[karamuca_ra@cobra prog3]$ ./myCreate album.med tree.ind[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[KUpdate 
+myUpdate: Must have 2 files in the format of ./myUpdate <tree.ind file> <transaction.dat file>.
+]0;karamuca_ra@cobra:~/classes/csc310/projects/prog3[karamuca_ra@cobra prog3]$ ./myUpdate tree.ind trans2.dat 
+	"20831-4207-2" not found
+	"7559-61257-2" not found
+	"non-existing" not found
+	"08811-134120" not found
+	"01015" not found
+	"6695-158-447" not found
+	"01" not found
+
+	Total Reads = 16
+	Total Writes = 0
+]0;karamuca_ra@cobra:~/classes/csc310/projects/prog3[karamuca_ra@cobra prog3]$ exit
+exit
+
+Script done on Sat 08 May 2021 09:09:59 PM EDT
